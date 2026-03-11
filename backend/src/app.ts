@@ -2,6 +2,10 @@ import express, { Request, Response } from 'express';
 import session from "express-session";
 import cors from 'cors';
 
+import placeSearchRouter from "./routes/placeSearch.js";
+import jejuWeatherRouter from "./routes/jejuweather.js";
+import oauthRouter from "./routes/oauth.js";
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -14,6 +18,10 @@ app.use(
     saveUninitialized: false,
   })
 );
+
+app.use("/api/place", placeSearchRouter);
+app.use("/api/weather", jejuWeatherRouter);
+app.use("/api/auth", oauthRouter);
 
 app.get("/health", (req: Request, res: Response) => {
   res.status(200).json({
