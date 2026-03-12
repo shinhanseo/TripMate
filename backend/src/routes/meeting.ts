@@ -36,18 +36,18 @@ router.get("/", authRequired, async (req: AuthRequest, res: Response) => {
     return res.json({
       success: true,
       data: {
-        userId,
+        userId,                                           // user id
         items: meetingRes.rows.map((row) => ({
-          id: row.id,
-          title: row.title,
-          placeText: row.place_text,
-          scheduledAt: row.scheduled_at,
-          maxMembers: row.max_members,
-          currentMembers: Number(row.current_members),
-          gender: row.gender,
-          ageGroup: row.age_group,
-          category: row.category,
-          regionPrimary: row.region_primary,
+          id: row.id,                                     // 동행 id
+          title: row.title,                               // 동행 제목
+          placeText: row.place_text,                      // 동행 장소
+          scheduledAt: row.scheduled_at,                  // 동행 시간
+          maxMembers: row.max_members,                    // 정원
+          currentMembers: Number(row.current_members),    // 현재원
+          gender: row.gender,                             // 모집 성별
+          ageGroup: row.age_group,                        // 모집 연령
+          category: row.category,                         // 카테고리  
+          regionPrimary: row.region_primary,              // 분류 지역
         })),
       },
     });
@@ -183,7 +183,7 @@ router.post("/", authRequired, async (req: AuthRequest, res: Response) => {
   const client = await pool.connect();
 
   try {
-    await client.query("BEGIN");
+    await client.query("begin");
 
     const meetingRes = await client.query(
       `
@@ -274,7 +274,7 @@ router.post("/", authRequired, async (req: AuthRequest, res: Response) => {
   } catch (error: any) {
     await client.query("rollback");
     return res.status(500).json({
-      sccess: false,
+      success: false,
       message: "failed to create meeting"
     });
 
@@ -512,5 +512,175 @@ router.delete("/:id", authRequired, async (req: AuthRequest, res) => {
     client.release();
   }
 });
+
+router.post("/:id/join", authRequired, async (req: AuthRequest, res) => {
+  const meetingId = Number(req.params.id);
+  const userId = req.user!.userId;
+
+  if (!Number.isInteger(meetingId) || meetingId <= 0) {
+    return res.status(400).json({
+      success: false,
+      message: "invalid meeting id",
+    });
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query("begin");
+
+    const joinCheckRes = await client.query(
+      `
+        select id
+        from meeting_members
+        where user_id = $1 and meeting_id = $2 and status = 'joined'
+      `,
+      [userId, meetingId]
+    );
+
+    if (joinCheckRes.rowCount !== 0) {
+      await client.query("rollback");
+      return res.status(409).json({ message: "already joined meeting" });
+    }
+
+    const memberCountCheckRes = await client.query(
+      `
+        select
+          m.max_members,
+          count(mm.id) as current_member_count,
+          m.status
+        from meetings m
+        left join meeting_members mm
+          on mm.meeting_id = m.id
+          and mm.status = 'joined'
+        where m.id = $1
+        group by m.id, m.max_members, m.status
+      `,
+      [meetingId]
+    );
+
+
+    if (memberCountCheckRes.rowCount === 0) {
+      await client.query("rollback");
+      return res.status(404).json({
+        success: false,
+        message: "meeting not found",
+      });
+    }
+
+    if (memberCountCheckRes.rows[0].status !== 'open') {
+      await client.query("rollback");
+      return res.status(409).json({
+        message: "meeting status is not open"
+      });
+    }
+
+    const meetingMaxMember = memberCountCheckRes.rows[0].max_members;
+    const meetingCurrentMember = memberCountCheckRes.rows[0].current_member;
+
+    if (Number(meetingCurrentMember) >= Number(meetingMaxMember)) {
+      await client.query("rollback");
+      return res.status(409).json({ message: "over capacity meeting" });
+    }
+
+    const joinRes = await client.query(
+      `
+      insert into meeting_members(
+        meeting_id,
+        user_id,
+        role,
+        status
+      )
+      values ($1, $2, 'member', 'joined')
+      returning id
+      `,
+      [meetingId, userId]
+    );
+
+
+    if (joinRes.rowCount === 0) {
+      return res.status(500).json({ message: "failed to join meeting" });
+    }
+
+    await client.query("commit");
+
+    return res.status(201).json({
+      success: true,
+      data: {
+        item: {
+          id: joinRes.rows[0].id
+        }
+      }
+    })
+
+  } catch (error: any) {
+    await client.query("rollback");
+    return res.status(500).json({
+      success: false,
+      message: "failed to join meeting",
+    })
+  } finally {
+    client.release();
+  }
+});
+
+router.post("/:id/leave", authRequired, async (req: AuthRequest, res) => {
+  const meetingId = Number(req.params.id);
+  const userId = req.user!.userId;
+
+  if (!Number.isInteger(meetingId) || meetingId <= 0) {
+    return res.status(400).json({
+      success: false,
+      message: "invalid meeting id",
+    });
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query("begin");
+
+    const meetingMemberCheckRes = await client.query(
+      `
+      select id, meeting_id, user_id
+      from meeting_members
+      where meeting_id = $1 and user_id = $2 and status = 'joined'
+      `,
+      [meetingId, userId]
+    );
+
+    if (meetingMemberCheckRes.rowCount === 0) {
+      return res.status(400).json({ message: "not found meeting_member" });
+    }
+
+    const meetingMemberId = meetingMemberCheckRes.rows[0].id;
+
+    await client.query(
+      `
+      update meeting_members
+      set status = 'left'
+      where id = $1
+      `,
+      [meetingMemberId]
+    );
+
+    await client.query("commit");
+
+    return res.json({
+      success: true,
+      message: "meeting leaved"
+    });
+
+  } catch (error: any) {
+    await client.query("rollback");
+
+    return res.status(500).json({
+      success: false,
+      message: "failed to leave meeting"
+    });
+  } finally {
+    client.release();
+  }
+})
 
 export default router;
