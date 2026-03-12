@@ -164,7 +164,7 @@ router.get("/search", async (req, res) => {
       return true;
     });
 
-    return ok(res, { places: merged });
+    return ok(res, { items: merged });
   } catch (err: any) {
     const status = err?.response?.status ?? 0;
 
@@ -231,7 +231,7 @@ router.get("/map-pick", async (req, res) => {
       source: "map_pick",
     });
 
-    return ok(res, { place });
+    return ok(res, { item: place });
   } catch (err: any) {
     const status = err?.response?.status ?? 0;
 

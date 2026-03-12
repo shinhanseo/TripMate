@@ -61,7 +61,7 @@ router.get("/", async (_req, res: Response) => {
     );
 
     return ok(res, {
-      weather: buildWeatherDto(response.data),
+      item: buildWeatherDto(response.data),
     });
   } catch (err: any) {
     console.error("GET /weather error:", err);

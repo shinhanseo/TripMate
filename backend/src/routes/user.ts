@@ -79,7 +79,7 @@ router.patch("/nickname", authRequired, async (req: AuthRequest, res) => {
     await client.query("commit");
 
     return ok(res, {
-      user: {
+      item: {
         id: nicknameRes.rows[0].user_id,
         nickname: nicknameRes.rows[0].nickname,
         profile_completed: true,
