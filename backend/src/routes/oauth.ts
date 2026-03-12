@@ -369,7 +369,7 @@ router.post("/session/exchange", async (req, res) => {
     );
 
     const profileResult = await client.query( // 프로필 조회
-      `select gender, age_range
+      `select gender, age_range, nickname
        from user_profiles
        where user_id = $1
        limit 1`,
@@ -379,6 +379,7 @@ router.post("/session/exchange", async (req, res) => {
     await client.query("COMMIT");
 
     const profile = profileResult.rows[0] || {};
+    const nickname = profile.nickname ?? null;
 
     return res.json({
       success: true,
@@ -387,8 +388,10 @@ router.post("/session/exchange", async (req, res) => {
         refresh_token: refreshToken,
         user: {
           id: userId,
+          nickname,
           gender: profile.gender ?? null,
           age_range: profile.age_range ?? null,
+          profile_completed: false
         },
       },
     });
