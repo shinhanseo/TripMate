@@ -6,6 +6,7 @@ import placeSearchRouter from "./routes/placeSearch.js";
 import jejuWeatherRouter from "./routes/jejuWeather.js";
 import oauthRouter from "./routes/oauth.js";
 import meetingRouter from "./routes/meeting.js";
+import userRouter from "./routes/user.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,6 +25,7 @@ app.use("/api/place", placeSearchRouter);
 app.use("/api/weather", jejuWeatherRouter);
 app.use("/api/auth", oauthRouter);
 app.use("/api/meeting", meetingRouter);
+app.use("api/user", userRouter);
 
 app.get("/health", (req: Request, res: Response) => {
   res.status(200).json({
