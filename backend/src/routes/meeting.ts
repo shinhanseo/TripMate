@@ -1,7 +1,8 @@
 import { Router, Response } from "express";
 import { pool } from "../db.js";
 import { authRequired, AuthRequest } from "../middleware/authRequired.js";
-import { isValidAgeGroups } from "../utils/ageGroup.js";
+import { isValidAgeGroups } from "../modules/meetings/meetings-invalid.js";
+import { meetingMapper } from "../modules/meetings/meetings-mapper.js";
 import { ok, fail } from "../utils/response.js";
 
 const router = Router();
@@ -48,6 +49,32 @@ router.get("/", authRequired, async (req: AuthRequest, res: Response) => {
         category: row.category,
         regionPrimary: row.region_primary,
       })),
+    });
+  } catch (error: any) {
+    return fail(res, 500, "failed to load meetings");
+  } finally {
+    client.release();
+  }
+});
+
+//홈 화면 지도 용 요약해서 보기
+router.get("/home", authRequired, async (req: AuthRequest, res: Response) => {
+  const client = await pool.connect();
+
+  try {
+    const meetingRes = await client.query(
+      `
+      select id, category, region_primary
+      from meetings
+      where status = 'open'
+      order by id asc
+      `
+    );
+
+    const regionGroup = meetingMapper(meetingRes.rows);
+
+    return ok(res, {
+      item: regionGroup
     });
   } catch (error: any) {
     return fail(res, 500, "failed to load meetings");
