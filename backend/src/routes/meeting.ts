@@ -658,7 +658,7 @@ router.post("/:id/leave", authRequired, async (req: AuthRequest, res: Response) 
 
     const meetingMemberCheckRes = await client.query(
       `
-      select id, meeting_id, user_id
+      select id, meeting_id, user_id, role
       from meeting_members
       where meeting_id = $1
         and user_id = $2
@@ -672,7 +672,27 @@ router.post("/:id/leave", authRequired, async (req: AuthRequest, res: Response) 
       return fail(res, 400, "meeting_member not found");
     }
 
+    if (meetingMemberCheckRes.rows[0].role === "host") {
+      await client.query("rollback");
+      return fail(res, 403, "host cannot leave meeting");
+    }
+
     const meetingMemberId = meetingMemberCheckRes.rows[0].id;
+
+    const meetingRes = await client.query(
+      `
+      select id, max_members, status
+      from meetings
+      where id = $1
+      for update
+      `,
+      [meetingId]
+    );
+
+    if (meetingRes.rowCount === 0) {
+      await client.query("rollback");
+      return fail(res, 404, "meeting not found");
+    }
 
     await client.query(
       `
@@ -682,6 +702,31 @@ router.post("/:id/leave", authRequired, async (req: AuthRequest, res: Response) 
       `,
       [meetingMemberId]
     );
+
+    const memberCountRes = await client.query(
+      `
+      select count(id) as current_member_count
+      from meeting_members
+      where meeting_id = $1
+        and status = 'joined'
+      `,
+      [meetingId]
+    );
+
+    const meetingMaxMember = Number(meetingRes.rows[0].max_members);
+    const meetingCurrentMember = Number(memberCountRes.rows[0].current_member_count);
+
+    if (meetingCurrentMember < meetingMaxMember) {
+      await client.query(
+        `
+        update meetings
+        set status = 'open'
+        where id = $1
+          and status = 'closed'
+        `,
+        [meetingId]
+      );
+    }
 
     await client.query("commit");
 
