@@ -3,7 +3,7 @@ import { isValidRegion } from "./meetings-invalid.js";
 type MeetingItem = {
   id: number;
   category: string;
-  regionPrimary: string;
+  region_primary: string;
 };
 
 const jejuRegionGroup = [
@@ -20,8 +20,8 @@ const jejuRegionGroup = [
 export function meetingMapper(meetings: MeetingItem[]) {
   const grouped = meetings.reduce<Record<string, MeetingItem[]>>(
     (acc, meeting) => {
-      const key = isValidRegion(meeting.regionPrimary)
-        ? meeting.regionPrimary
+      const key = isValidRegion(meeting.region_primary)
+        ? meeting.region_primary
         : "기타 제주";
 
       if (!acc[key]) {
