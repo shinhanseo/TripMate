@@ -1,7 +1,7 @@
 import { Router, Response } from "express";
 import { pool } from "../db.js";
 import { authRequired, AuthRequest } from "../middleware/authRequired.js";
-import { isValidAgeGroups, isValidCategory, isValidGender, isValidAgeGroup } from "../modules/meetings/meetings-invalid.js";
+import { isValidAgeGroups, isValidCategory, isValidGender, isValidAgeGroup, isValidRegion } from "../modules/meetings/meetings-invalid.js";
 import { meetingMapper } from "../modules/meetings/meetings-mapper.js";
 import { ok, fail } from "../utils/response.js";
 
@@ -252,6 +252,56 @@ router.post("/", authRequired, async (req: AuthRequest, res: Response) => {
     category,
     description,
   } = req.body;
+
+  if (
+    typeof title !== "string" ||
+    !title.trim() ||
+    typeof placeText !== "string" ||
+    !placeText.trim() ||
+    typeof regionPrimary !== "string" ||
+    !regionPrimary.trim() ||
+    typeof regionSecondary !== "string" ||
+    !regionSecondary.trim() ||
+    typeof scheduledAt !== "string" ||
+    !scheduledAt.trim() ||
+    typeof description !== "string" ||
+    !description.trim()
+  ) {
+    return fail(res, 400, "invalid text fields");
+  }
+
+  const latNum = Number(placeLat);
+  const lngNum = Number(placeLng);
+  const maxMembersNum = Number(maxMembers);
+
+  if (!Number.isFinite(latNum) || !Number.isFinite(lngNum)) {
+    return fail(res, 400, "invalid place coordinates");
+  }
+
+  if (!Number.isInteger(maxMembersNum) || maxMembersNum < 2) {
+    return fail(res, 400, "invalid maxMembers");
+  }
+
+  if (!isValidRegion(regionPrimary)) {
+    return fail(res, 400, "invalid regionPrimary");
+  }
+
+  if (typeof gender !== "string" || !isValidGender(gender)) {
+    return fail(res, 400, "invalid gender");
+  }
+
+  if (!isValidAgeGroups(ageGroups)) {
+    return fail(res, 400, "invalid ageGroups");
+  }
+
+  if (!isValidCategory(category)) {
+    return fail(res, 400, "invalid category");
+  }
+
+  const scheduledDate = new Date(scheduledAt);
+  if (Number.isNaN(scheduledDate.getTime())) {
+    return fail(res, 400, "invalid scheduledAt");
+  }
 
   if (!isValidAgeGroups(ageGroups)) {
     return fail(res, 400, "invalid ageGroups");
