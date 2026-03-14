@@ -1,11 +1,11 @@
 const ALLOWED_GENDERS = ["male", "female", "any"] as const;
 export type Gender = (typeof ALLOWED_GENDERS)[number];
 
-const ALLOWED_AGE_GROUPS = ["any", "20s", "30s", "40s", "50s"];
+const ALLOWED_AGE_GROUPS = ["any", "20s", "30s", "40s", "50s"] as const;
 export type AgeGroup = (typeof ALLOWED_AGE_GROUPS)[number];
 
 const ALLOWED_CATEGORIES = ["food", "cafe", "drink", "travel", "activity"] as const;
-type Category = (typeof ALLOWED_CATEGORIES)[number];
+export type Category = (typeof ALLOWED_CATEGORIES)[number];
 
 const ALLOWED_REGION = [
   "애월/한담권",
@@ -15,9 +15,9 @@ const ALLOWED_REGION = [
   "표선/성읍권",
   "중문/안덕권",
   "서귀포시내권",
-  "제주시/공항권"
-];
-type Region = (typeof ALLOWED_REGION)[number];
+  "제주시/공항권",
+] as const;
+export type Region = (typeof ALLOWED_REGION)[number];
 
 export function isValidRegion(value: string): value is Region {
   return ALLOWED_REGION.includes(value as Region);
@@ -28,9 +28,15 @@ export function isValidGender(value: string): value is Gender {
 }
 
 export function isValidCategory(value: unknown): value is Category {
-  return ALLOWED_CATEGORIES.includes(value as Category);
+  return typeof value === "string" && ALLOWED_CATEGORIES.includes(value as Category);
 }
 
+// 목록 필터용: 연령 1개 선택
+export function isValidAgeGroup(value: unknown): value is AgeGroup {
+  return typeof value === "string" && ALLOWED_AGE_GROUPS.includes(value as AgeGroup);
+}
+
+// 생성/수정용: 연령 여러 개 선택
 export function isValidAgeGroups(value: unknown): value is AgeGroup[] {
   if (!Array.isArray(value) || value.length === 0) {
     return false;
@@ -50,5 +56,3 @@ export function isValidAgeGroups(value: unknown): value is AgeGroup[] {
 
   return true;
 }
-
-
