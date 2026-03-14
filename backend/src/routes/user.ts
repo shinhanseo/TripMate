@@ -23,24 +23,6 @@ router.patch("/nickname", authRequired, async (req: AuthRequest, res) => {
   const client = await pool.connect();
 
   try {
-    await client.query("begin");
-
-    const nicknameCheckRes = await client.query(
-      `
-      select user_id
-      from user_profiles
-      where nickname = $1
-        and user_id <> $2
-      limit 1
-      `,
-      [nickname, userId]
-    );
-
-    if (nicknameCheckRes.rowCount !== 0) {
-      await client.query("rollback");
-      return fail(res, 409, "duplicate nickname");
-    }
-
     const nicknameRes = await client.query(
       `
       update user_profiles
@@ -53,11 +35,8 @@ router.patch("/nickname", authRequired, async (req: AuthRequest, res) => {
     );
 
     if (nicknameRes.rowCount === 0) {
-      await client.query("rollback");
       return fail(res, 404, "profile not found");
     }
-
-    await client.query("commit");
 
     return ok(res, {
       item: {
@@ -67,7 +46,10 @@ router.patch("/nickname", authRequired, async (req: AuthRequest, res) => {
       },
     });
   } catch (error: any) {
-    await client.query("rollback");
+    if (error.code === "23505") {
+      return fail(res, 409, "duplicate nickname");
+    }
+
     return fail(res, 500, "failed to set nickname", error.message);
   } finally {
     client.release();
