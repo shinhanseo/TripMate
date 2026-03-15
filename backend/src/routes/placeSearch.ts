@@ -158,4 +158,49 @@ router.get("/map-pick", async (req, res) => {
   }
 });
 
+router.get("/mylocation", async (req, res) => {
+  const apiKey = process.env.KAKAO_REST_API_KEY;
+  if (!apiKey) {
+    return fail(res, 500, "KAKAO_REST_API_KEY missing");
+  }
+
+  const latNum = Number(req.query.lat);
+  const lngNum = Number(req.query.lng);
+
+  if (!Number.isFinite(latNum) || !Number.isFinite(lngNum)) {
+    return fail(res, 400, "invalid lat/lng");
+  }
+
+  try {
+    const kakaoRes = await axios.get(
+      "https://dapi.kakao.com/v2/local/geo/coord2address.json",
+      {
+        headers: {
+          Authorization: `KakaoAK ${apiKey}`,
+        },
+        params: {
+          x: lngNum,
+          y: latNum,
+        },
+        timeout: 5000,
+      }
+    );
+
+    const doc = kakaoRes.data?.documents?.[0];
+    const region1 = doc?.address?.region_1depth_name ?? null;
+    const region2 = doc?.address?.region_2depth_name ?? null;
+
+    const isJejuCity = region1 === "제주특별자치도" && region2 === "제주시";
+
+    return ok(res, {
+      item: {
+        region1,
+        region2,
+        isJejuCity,
+      },
+    });
+  } catch (error: any) {
+    return fail(res, 500, "failed to gecode my location");
+  }
+});
 export default router;
