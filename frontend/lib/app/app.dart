@@ -11,6 +11,6 @@ class App extends StatelessWidget {
       title: 'TripMate',
       initialRoute: AppRouter.home,
       onGenerateRoute: AppRouter.onGenerateRoute,
-    )
+    );
   }
 }
