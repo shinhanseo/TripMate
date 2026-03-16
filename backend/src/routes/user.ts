@@ -262,7 +262,7 @@ router.patch("/profile", authRequired, async (req: AuthRequest, res) => {
     return fail(res, 400, "invalid profile input");
   }
 
-  const { nickname, bio, category } = profileInput;
+  const { nickname, bio, category, profileImageUrl } = profileInput;
 
   const client = await pool.connect();
 
@@ -273,17 +273,19 @@ router.patch("/profile", authRequired, async (req: AuthRequest, res) => {
       set nickname = $1,
           bio = $2,
           favorite_tags = $3,
+          profile_image_url = $4, 
           updated_now = now()
-      where user_id = $4
+      where user_id = $5
       `,
-      [nickname, bio, category, userId]
+      [nickname, bio, category, profileImageUrl, userId]
     );
 
     return ok(res, {
       item: {
         nickname,
         bio,
-        category
+        category,
+        profileImageUrl,
       }
     }, 201);
   } catch {
