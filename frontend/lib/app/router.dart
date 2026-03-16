@@ -5,8 +5,8 @@ import '../features/auth/views/nickname_page.dart';
 import '../features/splash/views/splash_page.dart';
 
 class AppRouter {
-  static const String home = '/';
-  static const String signup = '/signup';
+  static const String home = '/home';
+  static const String login = '/login';
   static const String nickname = '/nickname';
   static const String splash = '/splash';
 
@@ -18,7 +18,7 @@ class AppRouter {
           settings: settings,
         );
 
-      case signup:
+      case login:
         return MaterialPageRoute(
           builder: (_) => const LoginPage(),
           settings: settings,
