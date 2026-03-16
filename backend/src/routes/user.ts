@@ -295,4 +295,45 @@ router.patch("/profile", authRequired, async (req: AuthRequest, res) => {
   }
 })
 
+router.get("/,e", authRequired, async (req: AuthRequest, res) => {
+  const userId = req.user!.userId;
+
+  const client = await pool.connect();
+  try {
+    const userRes = await client.query(
+      `
+      select
+        u.id,
+        up.nickname,
+        up.gender,
+        up.age_range
+      from users u
+      left join user_profiles up
+        on up.user_id = u.id
+      where u.id = $1
+      limit 1
+      `,
+      [userId]
+    );
+
+    if (userRes.rowCount === 0) {
+      return fail(res, 400, "user not fount");
+    }
+
+    const user = userRes.rows[0];
+    const profileCompleted = !!user.nickname;
+
+    return ok(res, {
+      id: user.id,
+      nickname: user.nickname ?? null,
+      gender: user.gender ?? null,
+      age_range: user.age_range ?? null,
+      profile_completed: profileCompleted,
+    });
+  } catch (error: any) {
+    return fail(res, 500, "failed to get my profile", error?.message);
+  } finally {
+    client.release();
+  }
+})
 export default router;
