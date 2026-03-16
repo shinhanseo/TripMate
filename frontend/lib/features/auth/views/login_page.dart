@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../services/auth_api.dart';
 import '../viewmodels/login_viewmodel.dart';
 import '../services/token_storage.dart';
+import 'package:provider/provider.dart';
+import '../viewmodels/auth_state.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -28,10 +30,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onViewModelChanged() {
+    if (!mounted) return;
+
     setState(() {});
 
     final result = viewModel.loginResult;
     if (result == null) return;
+
+    context.read<AuthState>().setUser(result.user);
 
     if (result.user.profileCompleted) {
       Navigator.pushReplacementNamed(context, '/home');
