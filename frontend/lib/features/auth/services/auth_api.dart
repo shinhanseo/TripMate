@@ -48,4 +48,28 @@ class AuthApi {
 
     throw Exception(json['message'] ?? '사용자 정보를 불러오지 못했습니다.');
   }
+
+  Future<void> updateNickname({
+    required String accessToken,
+    required String nickname,
+  }) async {
+    final url = Uri.parse('$baseUrl/api/user/nickname');
+
+    final response = await http.patch(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({'nickname': nickname}),
+    );
+
+    final Map<String, dynamic> json = jsonDecode(response.body);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return;
+    }
+
+    throw Exception(json['message'] ?? '닉네임 설정에 실패했습니다.');
+  }
 }
