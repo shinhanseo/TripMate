@@ -24,44 +24,53 @@ class _NicknamePageViewState extends State<NicknamePage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 36),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 70),
 
-              const Text(
-                '닉네임 설정',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+              const Center(
+                child: Text(
+                  '닉네임 설정',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
               ),
 
               const SizedBox(height: 16),
 
-              const Text(
-                '다른 여행자들에게 보여질 닉네임을 설정하세요.',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  height: 1.5,
-                  color: Colors.black,
+              const Center(
+                child: Text(
+                  '다른 여행자들에게 보여질 닉네임을 설정하세요.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    height: 1.5,
+                    color: Colors.black,
+                  ),
                 ),
               ),
 
               const SizedBox(height: 70),
 
-              const Text(
-                '최소 2자 ~ 최대 12자',
-                textAlign: TextAlign.left,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  height: 1.5,
-                  color: Color(0xFF999999),
+              const Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  '최소 2자 ~ 최대 12자',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    height: 1.5,
+                    color: Color(0xFF999999),
+                  ),
                 ),
               ),
 
@@ -97,46 +106,27 @@ class _NicknamePageViewState extends State<NicknamePage> {
 
               const SizedBox(height: 16),
 
-              const Text(
-                '마이페이지에서 추후에 수정이 가능합니다.',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  height: 1.5,
-                  color: Colors.black,
+              const Center(
+                child: Text(
+                  '마이페이지에서 추후에 수정이 가능합니다.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    height: 1.5,
+                    color: Colors.black,
+                  ),
                 ),
               ),
 
-              const Spacer(),
+              const SizedBox(height: 260),
 
               SizedBox(
                 width: double.infinity,
                 height: 58,
-                child: ElevatedButton(
-                  onPressed: vm.isLoading
-                      ? null
-                      : () async {
-                          await vm.submitNickname(_nicknameController.text);
-
-                          if (!context.mounted) return;
-
-                          if (vm.isSuccess) {
-                            Navigator.pushReplacementNamed(context, '/home');
-                          } else if (vm.errorMessage != null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(vm.errorMessage!)),
-                            );
-                          }
-                        },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
                   child: Ink(
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
@@ -145,22 +135,35 @@ class _NicknamePageViewState extends State<NicknamePage> {
                         end: Alignment.centerRight,
                       ),
                       borderRadius: BorderRadius.circular(20),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 8,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
                     ),
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: Text(
-                        vm.isLoading ? '처리 중...' : '동행 시작하기',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: vm.isLoading
+                          ? null
+                          : () async {
+                              await vm.submitNickname(_nicknameController.text);
+
+                              if (!context.mounted) return;
+
+                              if (vm.isSuccess) {
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  '/home',
+                                );
+                              } else if (vm.errorMessage != null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(vm.errorMessage!)),
+                                );
+                              }
+                            },
+                      child: Center(
+                        child: Text(
+                          vm.isLoading ? '처리 중...' : '동행 시작하기',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
