@@ -2,10 +2,11 @@ type ProfileInput = {
   nickname: string;
   bio: string;
   category: string[];
+  profileImageUrl: string;
 };
 
 export function validateProfileInput(body: any): ProfileInput | null {
-  const { nickname, bio, category } = body;
+  const { nickname, bio, category, profileImageUrl } = body;
 
   if (!isValidNickname(nickname)) {
     return null;
@@ -37,6 +38,7 @@ export function validateProfileInput(body: any): ProfileInput | null {
     nickname: nickname.trim(),
     bio: trimmedBio,
     category,
+    profileImageUrl,
   };
 }
 
