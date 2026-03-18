@@ -22,19 +22,49 @@ class SplashViewModel extends ChangeNotifier {
       errorMessage = null;
       notifyListeners();
 
-      final accessToken = await tokenStorage.getAccessToken();
+      String? accessToken = await tokenStorage.getAccessToken();
 
       if (accessToken == null || accessToken.isEmpty) {
         shouldGoLogin = true;
         return;
       }
 
-      final me = await authApi.getMe(accessToken);
-      user = me;
-      if (me.profileCompleted) {
-        shouldGoHome = true;
-      } else {
-        shouldGoNickname = true;
+      try {
+        final me = await authApi.getMe(accessToken);
+        user = me;
+
+        if (me.profileCompleted) {
+          shouldGoHome = true;
+        } else {
+          shouldGoNickname = true;
+        }
+      } catch (e) {
+        final refreshToken = await tokenStorage.getRefreshToken();
+
+        if (refreshToken == null || refreshToken.isEmpty) {
+          await tokenStorage.clearTokens();
+          shouldGoLogin = true;
+          return;
+        }
+
+        final tokens = await authApi.updateAccessToken(
+          refreshToken: refreshToken,
+        );
+
+        final newAccessToken = tokens['access_token'];
+        final newRefreshToken = tokens['refresh_token'];
+
+        await tokenStorage.saveAccessToken(newAccessToken);
+        await tokenStorage.saveRefreshToken(newRefreshToken);
+
+        final me = await authApi.getMe(newAccessToken);
+        user = me;
+
+        if (me.profileCompleted) {
+          shouldGoHome = true;
+        } else {
+          shouldGoNickname = true;
+        }
       }
     } catch (e) {
       await tokenStorage.clearTokens();
