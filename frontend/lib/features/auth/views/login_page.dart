@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../services/auth_api.dart';
 import '../viewmodels/login_viewmodel.dart';
 import '../services/token_storage.dart';
-import 'package:provider/provider.dart';
 import '../viewmodels/auth_state.dart';
 
 class LoginPage extends StatefulWidget {
@@ -25,7 +25,6 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     viewModel.initialize();
-
     viewModel.addListener(_onViewModelChanged);
   }
 
