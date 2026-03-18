@@ -16,63 +16,109 @@ class SplashViewModel extends ChangeNotifier {
   bool shouldGoLogin = false;
   bool shouldGoNickname = false;
 
+  bool _isInitializing = false;
+  bool _didInitialize = false;
+  bool _isDisposed = false;
+
+  void _safeNotify() {
+    if (!_isDisposed) {
+      notifyListeners();
+    }
+  }
+
   Future<void> initialize() async {
+    if (_isInitializing || _didInitialize || _isDisposed) return;
+    _isInitializing = true;
+
     try {
       isLoading = true;
       errorMessage = null;
-      notifyListeners();
+      shouldGoHome = false;
+      shouldGoLogin = false;
+      shouldGoNickname = false;
+      _safeNotify();
 
       String? accessToken = await tokenStorage.getAccessToken();
+      String? refreshToken = await tokenStorage.getRefreshToken();
 
-      if (accessToken == null || accessToken.isEmpty) {
+      if (_isDisposed) return;
+
+      if ((accessToken == null || accessToken.isEmpty) &&
+          (refreshToken == null || refreshToken.isEmpty)) {
         shouldGoLogin = true;
         return;
       }
 
-      try {
-        final me = await authApi.getMe(accessToken);
-        user = me;
+      if (accessToken != null && accessToken.isNotEmpty) {
+        try {
+          final me = await authApi.getMe(accessToken);
+          if (_isDisposed) return;
 
-        if (me.profileCompleted) {
-          shouldGoHome = true;
-        } else {
-          shouldGoNickname = true;
-        }
-      } catch (e) {
-        final refreshToken = await tokenStorage.getRefreshToken();
+          user = me;
 
-        if (refreshToken == null || refreshToken.isEmpty) {
-          await tokenStorage.clearTokens();
-          shouldGoLogin = true;
+          if (me.profileCompleted) {
+            shouldGoHome = true;
+          } else {
+            shouldGoNickname = true;
+          }
+
+          _didInitialize = true;
           return;
-        }
-
-        final tokens = await authApi.updateAccessToken(
-          refreshToken: refreshToken,
-        );
-
-        final newAccessToken = tokens['access_token'];
-        final newRefreshToken = tokens['refresh_token'];
-
-        await tokenStorage.saveAccessToken(newAccessToken);
-        await tokenStorage.saveRefreshToken(newRefreshToken);
-
-        final me = await authApi.getMe(newAccessToken);
-        user = me;
-
-        if (me.profileCompleted) {
-          shouldGoHome = true;
-        } else {
-          shouldGoNickname = true;
-        }
+        } catch (e) {}
       }
+
+      if (refreshToken == null || refreshToken.isEmpty) {
+        await tokenStorage.clearTokens();
+        if (_isDisposed) return;
+
+        shouldGoLogin = true;
+        return;
+      }
+      final tokens = await authApi.updateAccessToken(
+        refreshToken: refreshToken,
+      );
+      if (_isDisposed) return;
+
+      final newAccessToken = tokens['access_token'] as String;
+      final newRefreshToken = tokens['refresh_token'] as String;
+
+      await tokenStorage.saveAccessToken(newAccessToken);
+      await tokenStorage.saveRefreshToken(newRefreshToken);
+
+      if (_isDisposed) return;
+
+      final me = await authApi.getMe(newAccessToken);
+      if (_isDisposed) return;
+
+      user = me;
+
+      if (me.profileCompleted) {
+        shouldGoHome = true;
+      } else {
+        shouldGoNickname = true;
+      }
+
+      _didInitialize = true;
     } catch (e) {
       await tokenStorage.clearTokens();
+
+      if (_isDisposed) return;
+
       shouldGoLogin = true;
       errorMessage = e.toString().replaceFirst('Exception: ', '');
     } finally {
+      _isInitializing = false;
+
+      if (_isDisposed) return;
+
       isLoading = false;
-      notifyListeners();
+      _safeNotify();
     }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 }
