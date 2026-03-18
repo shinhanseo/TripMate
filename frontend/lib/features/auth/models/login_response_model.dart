@@ -35,11 +35,11 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'],
+      id: int.parse(json['id'].toString()),
       nickname: json['nickname'],
       gender: json['gender'],
       ageRange: json['age_range'],
-      profileCompleted: json['profile_completed'],
+      profileCompleted: json['profile_completed'] == true,
     );
   }
 }
