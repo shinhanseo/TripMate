@@ -108,6 +108,7 @@ router.get("/home", authRequired, async (req: AuthRequest, res: Response) => {
       `
     );
 
+
     const regionGroup = meetingMapper(meetingRes.rows);
     /*
     const grouped = {
@@ -121,12 +122,23 @@ router.get("/home", authRequired, async (req: AuthRequest, res: Response) => {
     };
     */
 
-    const regionSummary = Object.entries(regionGroup).map(([regionPrimary, items]) => ({
-      regionPrimary,
-      firstCategory: items[0]?.category ?? null,
-      totalCount: items.length,
-      summaryText: `${items[0]?.category} · 외 ${items.length - 1}건`,
-    }));
+    const regionSummary = Object.entries(regionGroup).map(([regionPrimary, items]) => {
+      const firstCategory = items[0]?.category ?? null;
+
+      let icon = "📍";
+      if (firstCategory === "cafe") icon = "☕";
+      else if (firstCategory === "food") icon = "🍜";
+      else if (firstCategory === "activity") icon = "🪂";
+      else if (firstCategory === "drink") icon = "🍺";
+      else if (firstCategory === "tour") icon = "🚗";
+
+      return {
+        regionPrimary,
+        firstCategory,
+        totalCount: items.length,
+        summaryText: `${icon} ${firstCategory ?? "기타"} · 외 ${items.length - 1}건`,
+      };
+    });
 
     return ok(res, {
       item: regionSummary
