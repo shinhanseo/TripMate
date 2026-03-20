@@ -6,8 +6,10 @@ import '../features/auth/views/login_page.dart';
 import '../features/auth/views/nickname_page.dart';
 import '../features/auth/viewmodels/nickname_viewmodel.dart';
 import '../features/home/viewmodels/weather_viewmodel.dart';
+import '../features/home/viewmodels/region_summary_viewmodel.dart';
 import '../features/auth/services/auth_api.dart';
 import '../features/home/services/weather_api.dart';
+import '../features/home/services/region_summary_api.dart';
 import '../features/auth/services/token_storage.dart';
 import '../features/splash/views/splash_page.dart';
 import '../features/chat/views/chat_page.dart';
@@ -28,7 +30,7 @@ class AppRouter {
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     final name = settings.name ?? '/';
-    // query string 제거
+
     final uri = Uri.parse(name);
     final path = uri.path.isEmpty ? '/' : uri.path;
 
@@ -42,13 +44,24 @@ class AppRouter {
 
       case home:
         return MaterialPageRoute(
-          builder: (_) => ChangeNotifierProvider(
-            create: (_) => WeatherViewModel(
-              weatherApi: WeatherApi(baseUrl: 'http://192.168.45.203:3000'),
-            ),
-            child: const HomePage(),
+          builder: (_) => MultiProvider(
+            providers: [
+              ChangeNotifierProvider(
+                create: (_) => WeatherViewModel(
+                  weatherApi: WeatherApi(baseUrl: 'http://192.168.45.203:3000'),
+                ),
+              ),
+
+              ChangeNotifierProvider(
+                create: (_) => RegionSummaryViewModel(
+                  regionSummaryApi: HomeRegionSummaryApi(
+                    baseUrl: 'http://192.168.45.203:3000',
+                  ),
+                  tokenStorage: TokenStorage(),
+                ),
+              ),
+            ],
           ),
-          settings: settings,
         );
 
       case login:
