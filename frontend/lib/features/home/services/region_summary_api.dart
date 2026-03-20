@@ -8,17 +8,12 @@ class HomeRegionSummaryApi {
 
   HomeRegionSummaryApi({required this.baseUrl});
 
-  Future<List<RegionSummaryModel>> fetchRegionSummaryList({
-    required String accessToken,
-  }) async {
+  Future<List<RegionSummaryModel>> fetchRegionSummaryList() async {
     final url = Uri.parse('$baseUrl/api/meeting/home');
 
     final response = await http.get(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $accessToken',
-      },
+      headers: {'Content-Type': 'application/json'},
     );
 
     final Map<String, dynamic> json = jsonDecode(response.body);

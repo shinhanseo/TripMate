@@ -1,16 +1,11 @@
 import 'package:flutter/foundation.dart';
 import '../models/region_summary_model.dart';
 import '../services/region_summary_api.dart';
-import '../../auth/services/token_storage.dart';
 
 class RegionSummaryViewModel extends ChangeNotifier {
   final HomeRegionSummaryApi regionSummaryApi;
-  final TokenStorage tokenStorage;
 
-  RegionSummaryViewModel({
-    required this.regionSummaryApi,
-    required this.tokenStorage,
-  });
+  RegionSummaryViewModel({required this.regionSummaryApi});
 
   List<RegionSummaryModel> regionSummaries = [];
   bool isLoading = false;
@@ -21,20 +16,12 @@ class RegionSummaryViewModel extends ChangeNotifier {
     if (_hasLoaded || isLoading) return;
 
     try {
-      final accessToken = await tokenStorage.getAccessToken();
-
-      if (accessToken == null || accessToken.isEmpty) {
-        errorMessage = '로그인 정보가 없습니다.';
-        notifyListeners();
-        return;
-      }
-
       isLoading = true;
       errorMessage = null;
       notifyListeners();
 
       final List<RegionSummaryModel> result = await regionSummaryApi
-          .fetchRegionSummaryList(accessToken: accessToken);
+          .fetchRegionSummaryList();
 
       regionSummaries = result;
       _hasLoaded = true;
