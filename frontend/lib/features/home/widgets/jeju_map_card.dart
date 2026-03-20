@@ -12,14 +12,14 @@ class JejuMapCard extends StatelessWidget {
   });
 
   static const Map<String, Offset> regionPositions = {
-    '제주시/공항권': Offset(345, 78),
-    '애월/한담권': Offset(95, 145),
-    '협재/한림권': Offset(40, 215),
-    '함덕/조천권': Offset(505, 90),
-    '성산/우도권': Offset(690, 165),
-    '표선/성읍권': Offset(525, 305),
-    '중문/안덕권': Offset(175, 330),
-    '서귀포시내권': Offset(285, 360),
+    '제주시/공항권': Offset(345, 140),
+    '애월/한담권': Offset(95, 185),
+    '협재/한림권': Offset(40, 255),
+    '함덕/조천권': Offset(575, 120),
+    '성산/우도권': Offset(690, 185),
+    '표선/성읍권': Offset(635, 295),
+    '중문/안덕권': Offset(125, 330),
+    '서귀포시내권': Offset(445, 330),
   };
 
   @override
@@ -87,7 +87,7 @@ class _SummaryBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
@@ -103,7 +103,7 @@ class _SummaryBadge extends StatelessWidget {
       child: Text(
         text,
         style: const TextStyle(
-          fontSize: 16,
+          fontSize: 12,
           fontWeight: FontWeight.w800,
           color: Colors.black87,
         ),
