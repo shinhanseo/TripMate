@@ -95,7 +95,7 @@ router.get("/", authRequired, async (req: AuthRequest, res: Response) => {
 });
 
 //홈 화면 지도 용 요약해서 보기
-router.get("/home", authRequired, async (req: AuthRequest, res: Response) => {
+router.get("/home", async (_req, res: Response) => {
   const client = await pool.connect();
 
   try {
@@ -108,40 +108,45 @@ router.get("/home", authRequired, async (req: AuthRequest, res: Response) => {
       `
     );
 
-
     const regionGroup = meetingMapper(meetingRes.rows);
-    /*
-    const grouped = {
-      "제주시/공항권": [
-        { id: 1, category: "카페", regionPrimary: "제주시/공항권" },
-        { id: 2, category: "식사", regionPrimary: "제주시/공항권" }
-      ],
-      "애월/한담권": [
-        { id: 3, category: "액티비티", regionPrimary: "애월/한담권" }
-      ]
-    };
-    */
 
     const regionSummary = Object.entries(regionGroup).map(([regionPrimary, items]) => {
       const firstCategory = items[0]?.category ?? null;
 
+      let category = '기타';
       let icon = "📍";
-      if (firstCategory === "cafe") icon = "☕";
-      else if (firstCategory === "food") icon = "🍜";
-      else if (firstCategory === "activity") icon = "🪂";
-      else if (firstCategory === "drink") icon = "🍺";
-      else if (firstCategory === "tour") icon = "🚗";
+      if (firstCategory === "cafe") {
+        icon = "☕";
+        category = '카페';
+      } else if (firstCategory === "food") {
+        icon = "🍜";
+        category = '식사';
+      }
+      else if (firstCategory === "activity") {
+        icon = "🏄";
+        category = '액티비티';
+      }
+      else if (firstCategory === "drink") {
+        icon = "🍺";
+        category = '술';
+      }
+      else if (firstCategory === "tour") {
+        icon = "🚗";
+        category = '관광';
+      }
 
       return {
         regionPrimary,
         firstCategory,
         totalCount: items.length,
-        summaryText: `${icon} ${firstCategory ?? "기타"} · 외 ${items.length - 1}건`,
+        summaryText: items.length > 1
+          ? `${icon} ${category ?? "기타"} · 외 ${items.length - 1}건`
+          : `${icon} ${category ?? "기타"} 1건`,
       };
     });
 
     return ok(res, {
-      item: regionSummary
+      item: regionSummary,
     });
   } catch (error: any) {
     return fail(res, 500, "failed to load meetings");
@@ -149,6 +154,7 @@ router.get("/home", authRequired, async (req: AuthRequest, res: Response) => {
     client.release();
   }
 });
+
 
 // 동행 상세 조회
 router.get("/:id", authRequired, async (req: AuthRequest, res: Response) => {
