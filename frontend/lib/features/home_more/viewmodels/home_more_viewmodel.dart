@@ -15,6 +15,7 @@ class HomeMoreViewModel extends ChangeNotifier {
   String? selectedCategory;
   String? selectedGender;
   String? selectedAgeGroup;
+  String? selectedRegionPrimary;
   String? searchQuery;
 
   bool _hasLoaded = false;
@@ -41,6 +42,7 @@ class HomeMoreViewModel extends ChangeNotifier {
         category: selectedCategory,
         gender: selectedGender,
         ageGroup: selectedAgeGroup,
+        regionPrimary: selectedRegionPrimary,
         query: searchQuery,
       );
 
@@ -63,11 +65,13 @@ class HomeMoreViewModel extends ChangeNotifier {
     String? category,
     String? gender,
     String? ageGroup,
+    String? regionPrimary,
     String? query,
   }) async {
     selectedCategory = category;
     selectedGender = gender;
     selectedAgeGroup = ageGroup;
+    selectedRegionPrimary = regionPrimary;
     searchQuery = query;
     _hasLoaded = false;
 
@@ -78,6 +82,7 @@ class HomeMoreViewModel extends ChangeNotifier {
     selectedCategory = null;
     selectedGender = null;
     selectedAgeGroup = null;
+    selectedRegionPrimary = null;
     searchQuery = null;
     _hasLoaded = false;
     notifyListeners();

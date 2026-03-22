@@ -13,6 +13,7 @@ class MeetingApi {
     String? category,
     String? gender,
     String? ageGroup,
+    String? regionPrimary,
     String? query,
   }) async {
     final queryParams = <String, String>{};
@@ -27,6 +28,10 @@ class MeetingApi {
 
     if (ageGroup != null && ageGroup.isNotEmpty) {
       queryParams['ageGroup'] = ageGroup;
+    }
+
+    if (regionPrimary != null && regionPrimary.isNotEmpty) {
+      queryParams['regionPrimary'] = regionPrimary;
     }
 
     if (query != null && query.isNotEmpty) {

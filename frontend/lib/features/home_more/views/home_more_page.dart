@@ -6,6 +6,7 @@ import '../viewmodels/home_more_viewmodel.dart';
 import '../widgets/age_group_chip.dart';
 import '../widgets/category_chip.dart';
 import '../widgets/gender_chip.dart';
+import '../widgets/region_chip.dart';
 import '../widgets/meeting_card.dart';
 
 class HomeMorePage extends StatefulWidget {
@@ -40,6 +41,7 @@ class _HomeMorePageState extends State<HomeMorePage> {
       category: vm.selectedCategory,
       gender: vm.selectedGender,
       ageGroup: vm.selectedAgeGroup,
+      regionPrimary: vm.selectedRegionPrimary,
       query: _searchController.text.trim(),
     );
   }
@@ -50,6 +52,7 @@ class _HomeMorePageState extends State<HomeMorePage> {
     String? tempCategory = vm.selectedCategory;
     String? tempGender = vm.selectedGender;
     String? tempAgeGroup = vm.selectedAgeGroup;
+    String? tempRegion = vm.selectedRegionPrimary;
 
     await showModalBottomSheet(
       context: context,
@@ -98,6 +101,14 @@ class _HomeMorePageState extends State<HomeMorePage> {
                       ),
 
                       const SizedBox(height: 20),
+                      const Text(
+                        '카테고리',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                        ),
+                      ),
 
                       CategoryChip(
                         selectedCategory: tempCategory,
@@ -109,7 +120,14 @@ class _HomeMorePageState extends State<HomeMorePage> {
                       ),
 
                       const SizedBox(height: 8),
-
+                      const Text(
+                        '연령',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                        ),
+                      ),
                       AgeGroupChip(
                         selectedAgeGroup: tempAgeGroup,
                         onChanged: (value) {
@@ -120,12 +138,37 @@ class _HomeMorePageState extends State<HomeMorePage> {
                       ),
 
                       const SizedBox(height: 8),
-
+                      const Text(
+                        '성별',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                        ),
+                      ),
                       GenderChip(
                         selectedGender: tempGender,
                         onChanged: (value) {
                           setModalState(() {
                             tempGender = value;
+                          });
+                        },
+                      ),
+
+                      const SizedBox(height: 8),
+                      const Text(
+                        '지역',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                        ),
+                      ),
+                      RegionChip(
+                        selectedRegion: tempRegion,
+                        onChanged: (value) {
+                          setModalState(() {
+                            tempRegion = value;
                           });
                         },
                       ),
@@ -141,6 +184,7 @@ class _HomeMorePageState extends State<HomeMorePage> {
                                   tempCategory = null;
                                   tempGender = null;
                                   tempAgeGroup = null;
+                                  tempRegion = null;
                                 });
                               },
                               style: OutlinedButton.styleFrom(
@@ -172,6 +216,7 @@ class _HomeMorePageState extends State<HomeMorePage> {
                                   category: tempCategory,
                                   gender: tempGender,
                                   ageGroup: tempAgeGroup,
+                                  regionPrimary: tempRegion,
                                   query: _searchController.text.trim(),
                                 );
                               },
@@ -266,6 +311,11 @@ class _HomeMorePageState extends State<HomeMorePage> {
 
     if (vm.selectedGender != null && vm.selectedGender!.isNotEmpty) {
       values.add(_genderLabel(vm.selectedGender!));
+    }
+
+    if (vm.selectedRegionPrimary != null &&
+        vm.selectedRegionPrimary!.isNotEmpty) {
+      values.add(vm.selectedRegionPrimary!);
     }
 
     if (values.isEmpty) {
