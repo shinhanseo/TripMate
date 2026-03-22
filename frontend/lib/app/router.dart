@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../features/home/views/home_page.dart';
+import '../features/home/viewmodels/weather_viewmodel.dart';
+import '../features/home/viewmodels/region_summary_viewmodel.dart';
+import '../features/home/services/weather_api.dart';
+import '../features/home/services/region_summary_api.dart';
+
 import '../features/auth/views/login_page.dart';
 import '../features/auth/views/nickname_page.dart';
 import '../features/auth/viewmodels/nickname_viewmodel.dart';
-import '../features/home/viewmodels/weather_viewmodel.dart';
-import '../features/home/viewmodels/region_summary_viewmodel.dart';
 import '../features/auth/services/auth_api.dart';
-import '../features/home/services/weather_api.dart';
-import '../features/home/services/region_summary_api.dart';
 import '../features/auth/services/token_storage.dart';
+
+import '../features/home_more/views/home_more_page.dart';
+import '../features/home_more/viewmodels/home_more_viewmodel.dart';
+import '../features/home_more/services/meeting_api.dart';
+
 import '../features/splash/views/splash_page.dart';
 import '../features/chat/views/chat_page.dart';
 import '../features/mypage/views/mypage.dart';
-import '../features/home_more/views/home_more_page.dart';
 import '../features/meeting_create/views/meeting_create_page.dart';
 
 class AppRouter {
@@ -27,6 +33,7 @@ class AppRouter {
   static const String mypage = '/mypage';
   static const String homemore = '/homemore';
   static const String meetingcreate = '/meetingcreate';
+  static final baseUrl = dotenv.env['BASE_URL']!;
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     final name = settings.name ?? '/';
@@ -47,20 +54,17 @@ class AppRouter {
           builder: (_) => MultiProvider(
             providers: [
               ChangeNotifierProvider(
-                create: (_) => WeatherViewModel(
-                  weatherApi: WeatherApi(baseUrl: 'http://192.168.45.203:3000'),
-                ),
+                create: (_) =>
+                    WeatherViewModel(weatherApi: WeatherApi(baseUrl: baseUrl)),
               ),
 
               ChangeNotifierProvider(
                 create: (_) => RegionSummaryViewModel(
-                  regionSummaryApi: HomeRegionSummaryApi(
-                    baseUrl: 'http://192.168.45.203:3000',
-                  ),
-                  tokenStorage: TokenStorage(),
+                  regionSummaryApi: HomeRegionSummaryApi(baseUrl: baseUrl),
                 ),
               ),
             ],
+            child: const HomePage(),
           ),
         );
 
@@ -74,7 +78,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => ChangeNotifierProvider(
             create: (_) => NicknameViewModel(
-              authApi: AuthApi(baseUrl: 'http://192.168.45.203:3000'),
+              authApi: AuthApi(baseUrl: baseUrl),
               tokenStorage: TokenStorage(),
             ),
             child: const NicknamePage(),
@@ -96,7 +100,13 @@ class AppRouter {
 
       case homemore:
         return MaterialPageRoute(
-          builder: (_) => const HomeMorePage(),
+          builder: (_) => ChangeNotifierProvider(
+            create: (_) => HomeMoreViewModel(
+              meetingApi: MeetingApi(baseUrl: baseUrl),
+              tokenStorage: TokenStorage(),
+            ),
+            child: const HomeMorePage(),
+          ),
           settings: settings,
         );
 
