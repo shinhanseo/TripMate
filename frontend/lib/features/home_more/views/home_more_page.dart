@@ -206,19 +206,66 @@ class _HomeMorePageState extends State<HomeMorePage> {
     );
   }
 
+  String _categoryLabel(String value) {
+    switch (value) {
+      case 'cafe':
+        return '☕ 카페';
+      case 'food':
+        return '🍜 식사';
+      case 'activity':
+        return '🏄 액티비티';
+      case 'drink':
+        return '🍺 술';
+      case 'tour':
+        return '🚗 관광';
+      default:
+        return value;
+    }
+  }
+
+  String _ageGroupLabel(String value) {
+    switch (value) {
+      case 'any':
+        return '연령 무관';
+      case '20s':
+        return '20대';
+      case '30s':
+        return '30대';
+      case '40s':
+        return '40대';
+      case '50s':
+        return '50대';
+      default:
+        return value;
+    }
+  }
+
+  String _genderLabel(String value) {
+    switch (value) {
+      case 'any':
+        return '성별 무관';
+      case 'male':
+        return '남성';
+      case 'female':
+        return '여성';
+      default:
+        return value;
+    }
+  }
+
   String _filterSummary(HomeMoreViewModel vm) {
     final List<String> values = [];
 
     if (vm.selectedCategory != null && vm.selectedCategory!.isNotEmpty) {
-      values.add(vm.selectedCategory!);
+      values.add(_categoryLabel(vm.selectedCategory!));
     }
 
     if (vm.selectedAgeGroup != null && vm.selectedAgeGroup!.isNotEmpty) {
-      values.add(vm.selectedAgeGroup!);
+      values.add(_ageGroupLabel(vm.selectedAgeGroup!));
     }
 
     if (vm.selectedGender != null && vm.selectedGender!.isNotEmpty) {
-      values.add(vm.selectedGender!);
+      values.add(_genderLabel(vm.selectedGender!));
     }
 
     if (values.isEmpty) {
