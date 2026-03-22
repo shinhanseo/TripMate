@@ -493,13 +493,20 @@ class _HomeMorePageState extends State<HomeMorePage> {
       floatingActionButton: Container(
         width: 60,
         height: 60,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: LinearGradient(
             colors: [Color(0xFF35C7B5), Color(0xFFD7E76C)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.18),
+              blurRadius: 14,
+              offset: Offset(0, 6),
+            ),
+          ],
         ),
         child: Material(
           color: Colors.transparent,
