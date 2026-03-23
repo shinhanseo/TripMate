@@ -4,7 +4,7 @@ export type Gender = (typeof ALLOWED_GENDERS)[number];
 const ALLOWED_AGE_GROUPS = ["any", "20s", "30s", "40s", "50s"] as const;
 export type AgeGroup = (typeof ALLOWED_AGE_GROUPS)[number];
 
-const ALLOWED_CATEGORIES = ["food", "cafe", "drink", "travel", "activity"] as const;
+const ALLOWED_CATEGORIES = ["food", "cafe", "drink", "tour", "activity"] as const;
 export type Category = (typeof ALLOWED_CATEGORIES)[number];
 
 const ALLOWED_REGION = [

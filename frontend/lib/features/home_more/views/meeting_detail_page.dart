@@ -393,7 +393,7 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
         return '🍺 술';
       case 'activity':
         return '🏄 액티비티';
-      case 'travel':
+      case 'tour':
         return '🚗 관광';
       default:
         return category;
