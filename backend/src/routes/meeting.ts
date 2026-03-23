@@ -168,6 +168,7 @@ router.get("/home", async (_req, res: Response) => {
 // 동행 상세 조회
 router.get("/:id", authRequired, async (req: AuthRequest, res: Response) => {
   const meetingId = Number(req.params.id);
+  const userId = req.user!.userId;
 
   if (!Number.isInteger(meetingId) || meetingId <= 0) {
     return fail(res, 400, "invalid meeting id");
@@ -234,6 +235,7 @@ router.get("/:id", authRequired, async (req: AuthRequest, res: Response) => {
       item: {
         id: row.id,
         hostUserId: row.host_user_id,
+        currentUserId: userId,
         title: row.title,
         placeText: row.place_text,
         regionPrimary: row.region_primary,
