@@ -46,6 +46,7 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
     final bool isJoined = currentUserId != null
         ? detail.members.any((member) => member.userId == currentUserId)
         : false;
+    final bool isHost = currentUserId == vm.hostUserId ? true : false;
 
     return Scaffold(
       backgroundColor: const Color(0xffffffff),
@@ -211,6 +212,8 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
                       gender: member.gender,
                       ageRange: member.ageRange,
                       profileImageUrl: member.profileImageUrl ?? '',
+                      userId: member.userId,
+                      currentUserId: detail.currentUserId,
                     ),
                   ),
                 );
@@ -244,11 +247,59 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
             child: ElevatedButton(
               onPressed: () async {
                 try {
+                  if (isHost) {
+                    if (vm.currentMembers != 1) {
+                      showDialog(
+                        context: context,
+                        builder: (_) => const CustomMessageDialog(
+                          title: '삭제할 수 없어요.',
+                          message:
+                              '1명 이상의 동행자가 모집된 경우 삭제할 수 없습니다.\n다시 한번 확인해주세요.',
+                        ),
+                      );
+                      return;
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (_) => ConfirmDialog(
+                          title: '동행을 삭제하시겠어요?',
+                          message: '삭제 시 복구는 불가능합니다.',
+                          cancelText: '취소',
+                          confirmText: '삭제하기',
+                          onConfirm: () async {
+                            try {
+                              await context
+                                  .read<MeetingDetailViewModel>()
+                                  .deleteMeeting(detail.id);
+
+                              if (!context.mounted) return;
+                              Navigator.pop(context, true);
+                            } catch (e) {
+                              if (!context.mounted) return;
+
+                              showDialog(
+                                context: context,
+                                builder: (_) => CustomMessageDialog(
+                                  title: '삭제할 수 없어요.',
+                                  message: e.toString().replaceFirst(
+                                    'Exception: ',
+                                    '',
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      );
+                      return;
+                    }
+                  }
+
                   if (isJoined) {
                     showDialog(
                       context: context,
                       builder: (_) => ConfirmDialog(
-                        title: '모임에서 나가시겠어요?',
+                        title: '동행에서 나가시겠어요?',
                         message: '나가면 다시 참여해야 합니다.',
                         cancelText: '취소',
                         confirmText: '나가기',
@@ -284,7 +335,11 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
                 ),
               ),
               child: Text(
-                isJoined ? '나가기' : '참여하기',
+                isHost
+                    ? "동행 삭제하기"
+                    : isJoined
+                    ? '나가기'
+                    : '참여하기',
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
@@ -391,6 +446,8 @@ class _UserProfile extends StatelessWidget {
   final String gender;
   final String ageRange;
   final String profileImageUrl;
+  final int userId;
+  final int currentUserId;
 
   const _UserProfile({
     required this.nickname,
@@ -398,17 +455,23 @@ class _UserProfile extends StatelessWidget {
     required this.gender,
     required this.ageRange,
     required this.profileImageUrl,
+    required this.userId,
+    required this.currentUserId,
   });
 
   @override
   Widget build(BuildContext context) {
     final bool isHost = role == 'host';
-    final String badgeText = isHost ? '방장' : '동행자';
+    String badgeText = isHost ? '방장' : '동행자';
     final Color badgeColor = isHost
         ? const Color(0xff7ED3C6)
         : const Color(0xffD7DF6A);
     final String genderStr = gender == 'M' ? '남성' : '여성';
     final String ageStr = '${ageRange[0]}0대';
+
+    if (isHost == false && userId == currentUserId) {
+      badgeText = '본인';
+    }
 
     return IntrinsicWidth(
       child: Container(
