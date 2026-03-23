@@ -15,7 +15,9 @@ import '../features/auth/services/auth_api.dart';
 import '../features/auth/services/token_storage.dart';
 
 import '../features/home_more/views/home_more_page.dart';
+import '../features/home_more/views/meeting_detail_page.dart';
 import '../features/home_more/viewmodels/home_more_viewmodel.dart';
+import '../features/home_more/viewmodels/meeting_detail_viewmodel.dart';
 import '../features/home_more/services/meeting_api.dart';
 
 import '../features/splash/views/splash_page.dart';
@@ -33,6 +35,7 @@ class AppRouter {
   static const String mypage = '/mypage';
   static const String homemore = '/homemore';
   static const String meetingcreate = '/meetingcreate';
+  static const String meetingdetail = '/meetingdetail';
   static final baseUrl = dotenv.env['BASE_URL']!;
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -116,6 +119,23 @@ class AppRouter {
       case meetingcreate:
         return MaterialPageRoute(
           builder: (_) => const MeetingCreatePage(),
+          settings: settings,
+        );
+
+      case meetingdetail:
+        final meetingId = settings.arguments as int;
+
+        return MaterialPageRoute(
+          builder: (_) => ChangeNotifierProvider(
+            create: (_) => MeetingDetailViewModel(
+              meetingApi: MeetingApi(
+                baseUrl: baseUrl,
+                authApi: AuthApi(baseUrl: baseUrl),
+                tokenStorage: TokenStorage(),
+              ),
+            ),
+            child: MeetingDetailPage(meetingId: meetingId),
+          ),
           settings: settings,
         );
 
