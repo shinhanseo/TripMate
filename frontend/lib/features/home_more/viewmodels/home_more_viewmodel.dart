@@ -38,7 +38,6 @@ class HomeMoreViewModel extends ChangeNotifier {
       }
 
       final result = await meetingApi.getMeetings(
-        accessToken: accessToken,
         category: selectedCategory,
         gender: selectedGender,
         ageGroup: selectedAgeGroup,
