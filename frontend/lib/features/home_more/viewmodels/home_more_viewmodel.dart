@@ -1,12 +1,11 @@
 import 'package:flutter/foundation.dart';
 import '../models/meeting_model.dart';
 import '../services/meeting_api.dart';
-import '../../auth/services/token_storage.dart';
 
 class HomeMoreViewModel extends ChangeNotifier {
   final MeetingApi meetingApi;
-  final TokenStorage tokenStorage;
-  HomeMoreViewModel({required this.meetingApi, required this.tokenStorage});
+
+  HomeMoreViewModel({required this.meetingApi});
 
   MeetingListModel? meetingList;
   bool isLoading = false;
@@ -28,14 +27,6 @@ class HomeMoreViewModel extends ChangeNotifier {
       isLoading = true;
       errorMessage = null;
       notifyListeners();
-
-      final accessToken = await tokenStorage.getAccessToken();
-
-      if (accessToken == null || accessToken.isEmpty) {
-        errorMessage = '로그인 정보가 없습니다.';
-        meetingList = null;
-        return;
-      }
 
       final result = await meetingApi.getMeetings(
         category: selectedCategory,

@@ -12,8 +12,14 @@ class MeetingDetailViewModel extends ChangeNotifier {
   String? errorMessage;
   bool _hasLoaded = false;
 
-  Future<void> loadMeetingDetail(int meetingId) async {
-    if (isLoading || _hasLoaded) return;
+  int? get currentUserId => meetingDetail?.currentUserId;
+
+  Future<void> loadMeetingDetail(
+    int meetingId, {
+    bool forceRefresh = false,
+  }) async {
+    if (isLoading) return;
+    if (_hasLoaded && !forceRefresh) return;
 
     try {
       isLoading = true;
@@ -25,7 +31,7 @@ class MeetingDetailViewModel extends ChangeNotifier {
       meetingDetail = result;
       _hasLoaded = true;
     } catch (e) {
-      errorMessage = e.toString().replaceFirst('Exception : ', '');
+      errorMessage = e.toString().replaceFirst('Exception: ', '');
       meetingDetail = null;
     } finally {
       isLoading = false;
@@ -34,6 +40,42 @@ class MeetingDetailViewModel extends ChangeNotifier {
   }
 
   Future<void> refresh(int meetingId) async {
-    await loadMeetingDetail(meetingId);
+    await loadMeetingDetail(meetingId, forceRefresh: true);
+  }
+
+  Future<void> joinMeeting(int meetingId) async {
+    try {
+      isLoading = true;
+      errorMessage = null;
+      notifyListeners();
+
+      await meetingApi.joinMeeting(meetingId: meetingId);
+      final result = await meetingApi.getMeetingDetail(meetingId: meetingId);
+      meetingDetail = result;
+      _hasLoaded = true;
+    } catch (e) {
+      errorMessage = e.toString().replaceFirst('Exception: ', '');
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> leaveMeeting(int meetingId) async {
+    try {
+      isLoading = true;
+      errorMessage = null;
+      notifyListeners();
+
+      await meetingApi.leaveMeeting(meetingId: meetingId);
+      final result = await meetingApi.getMeetingDetail(meetingId: meetingId);
+      meetingDetail = result;
+      _hasLoaded = true;
+    } catch (e) {
+      errorMessage = e.toString().replaceFirst('Exception: ', '');
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 }
