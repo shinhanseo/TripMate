@@ -56,3 +56,89 @@ class MeetingListModel {
     );
   }
 }
+
+class MeetingMemberModel {
+  final int userId;
+  final String nickname;
+  final String? profileImageUrl;
+  final String role;
+  final DateTime joinedAt;
+
+  MeetingMemberModel({
+    required this.userId,
+    required this.nickname,
+    required this.profileImageUrl,
+    required this.role,
+    required this.joinedAt,
+  });
+
+  factory MeetingMemberModel.fromJson(Map<String, dynamic> json) {
+    return MeetingMemberModel(
+      userId: int.parse(json['userId'].toString()),
+      nickname: json['nickname'] as String,
+      profileImageUrl: json['profileImageUrl'] as String?,
+      role: json['role'] as String,
+      joinedAt: DateTime.parse(json['joinedAt'] as String),
+    );
+  }
+}
+
+class MeetingDetailModel {
+  final int id;
+  final int hostUserId;
+  final String title;
+  final String placeText;
+  final String regionPrimary;
+  final String? regionSecondary;
+  final DateTime scheduledAt;
+  final int maxMembers;
+  final int currentMembers;
+  final String gender;
+  final List<String> ageGroups;
+  final String category;
+  final String description;
+  final String status;
+  final List<MeetingMemberModel> members;
+
+  MeetingDetailModel({
+    required this.id,
+    required this.hostUserId,
+    required this.title,
+    required this.placeText,
+    required this.regionPrimary,
+    required this.regionSecondary,
+    required this.scheduledAt,
+    required this.maxMembers,
+    required this.currentMembers,
+    required this.gender,
+    required this.ageGroups,
+    required this.category,
+    required this.description,
+    required this.status,
+    required this.members,
+  });
+
+  factory MeetingDetailModel.fromJson(Map<String, dynamic> json) {
+    return MeetingDetailModel(
+      id: int.parse(json['id'].toString()),
+      hostUserId: int.parse(json['hostUserId'].toString()),
+      title: json['title'] as String,
+      placeText: json['placeText'] as String,
+      regionPrimary: json['regionPrimary'] as String,
+      regionSecondary: json['regionSecondary'] as String?,
+      scheduledAt: DateTime.parse(json['scheduledAt'] as String),
+      maxMembers: int.parse(json['maxMembers'].toString()),
+      currentMembers: int.parse(json['currentMembers'].toString()),
+      gender: json['gender'] as String,
+      ageGroups: (json['ageGroups'] as List<dynamic>)
+          .map((e) => e.toString())
+          .toList(),
+      category: json['category'] as String,
+      description: json['description'] as String,
+      status: json['status'] as String,
+      members: (json['members'] as List<dynamic>)
+          .map((e) => MeetingMemberModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
