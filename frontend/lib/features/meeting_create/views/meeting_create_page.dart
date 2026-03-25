@@ -33,6 +33,15 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
   String? selectedGender = 'any';
   String? selectedCategory = 'cafe';
 
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<MeetingCreateViewModel>().loadMe();
+    });
+  }
+
   Future<void> _openPlaceSearchPage() async {
     final selected = await Navigator.pushNamed(context, '/meetingplacesearch');
 
@@ -89,6 +98,7 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
   }
 
   Future<void> _submitMeeting() async {
+    final vm = context.read<MeetingCreateViewModel>();
     final scheduledAt = _getScheduledAt();
 
     if (_titleController.text.trim().isEmpty) {
@@ -132,6 +142,19 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
       return;
     }
 
+    if (!selectedAgeGroups.contains('any') &&
+        !selectedAgeGroups.contains(vm.ageRange)) {
+      showDialog(
+        context: context,
+        builder: (_) => const CustomMessageDialog(
+          title: '선택할 수 없어요.',
+          message: '본인의 연령이 포함된 조건만 선택할 수 있어요.\n다시 한번 확인해주세요.',
+        ),
+      );
+
+      return;
+    }
+
     final meeting = MeetingCreateModel(
       title: _titleController.text.trim(),
       placeText: _selectedPlaceName!,
@@ -167,6 +190,8 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.watch<MeetingCreateViewModel>();
+
     return Scaffold(
       backgroundColor: const Color(0xffffffff),
       resizeToAvoidBottomInset: true,
@@ -362,6 +387,18 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
                       GenderChip(
                         selectedGender: selectedGender,
                         onChanged: (values) {
+                          if (values != 'any' && vm.gender != values) {
+                            showDialog(
+                              context: context,
+                              builder: (_) => const CustomMessageDialog(
+                                title: '선택할 수 없어요.',
+                                message:
+                                    '본인의 성별이 포함된 조건만 선택할 수 있어요.\n다시 한번 확인해주세요.',
+                              ),
+                            );
+
+                            return;
+                          }
                           setState(() {
                             selectedGender = values;
                           });
