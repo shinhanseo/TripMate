@@ -317,6 +317,10 @@ router.post("/", authRequired, async (req: AuthRequest, res: Response) => {
     return fail(res, 400, "invalid regionPrimary");
   }
 
+  if (typeof placeAddress !== "string" || !placeAddress.trim()) {
+    return fail(res, 400, "invalid placeAddress");
+  }
+
   if (typeof gender !== "string" || !isValidGender(gender)) {
     return fail(res, 400, "invalid gender");
   }
@@ -332,10 +336,6 @@ router.post("/", authRequired, async (req: AuthRequest, res: Response) => {
   const scheduledDate = new Date(scheduledAt);
   if (Number.isNaN(scheduledDate.getTime())) {
     return fail(res, 400, "invalid scheduledAt");
-  }
-
-  if (!isValidAgeGroups(ageGroups)) {
-    return fail(res, 400, "invalid ageGroups");
   }
 
   const client = await pool.connect();
