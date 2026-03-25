@@ -25,6 +25,10 @@ import '../features/chat/views/chat_page.dart';
 import '../features/mypage/views/mypage.dart';
 import '../features/meeting_create/views/meeting_create_page.dart';
 
+import '../features/meeting_create/views/meeting_place_search_page.dart';
+import '../features/meeting_create/viewmodels/place_search_viewmodel.dart';
+import '../features/meeting_create/services/place_search_api.dart';
+
 class AppRouter {
   static const String root = '/';
   static const String home = '/home';
@@ -36,6 +40,7 @@ class AppRouter {
   static const String homemore = '/homemore';
   static const String meetingcreate = '/meetingcreate';
   static const String meetingdetail = '/meetingdetail';
+  static const String meetingplacesearch = '/meetingplacesearch';
   static final baseUrl = dotenv.env['BASE_URL']!;
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -135,6 +140,17 @@ class AppRouter {
               ),
             ),
             child: MeetingDetailPage(meetingId: meetingId),
+          ),
+          settings: settings,
+        );
+
+      case meetingplacesearch:
+        return MaterialPageRoute(
+          builder: (_) => ChangeNotifierProvider(
+            create: (_) => PlaceSearchViewModel(
+              placeSearchApi: PlaceSearchApi(baseUrl: baseUrl),
+            ),
+            child: const MeetingPlaceSearchPage(),
           ),
           settings: settings,
         );
