@@ -444,7 +444,7 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
               const SizedBox(height: 12),
 
               const Text(
-                '모임 소개',
+                '동행 소개',
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
 
