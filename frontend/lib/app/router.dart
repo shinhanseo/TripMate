@@ -131,6 +131,8 @@ class AppRouter {
                 authApi: AuthApi(baseUrl: baseUrl),
                 tokenStorage: TokenStorage(),
               ),
+              authApi: AuthApi(baseUrl: baseUrl),
+              tokenStorage: TokenStorage(),
             ),
             child: const MeetingCreatePage(),
           ),
