@@ -62,15 +62,20 @@ router.get("/search", async (req, res) => {
 
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
 
+        const buildingName = d.road_address?.building_name?.trim();
+        const addressName = d.road_address?.address_name || d.address_name || "";
+
         return buildPlaceItem({
-          name: d.address_name || "주소 결과",
-          address: d.road_address?.address_name || d.address_name || "",
+          name: buildingName || addressName || "주소 결과",
+          address: addressName,
           lat,
           lng,
           source: "address",
+          buildingName: buildingName || undefined,
         });
       })
       .filter(Boolean) as PlaceItem[];
+
 
     const seen = new Set<string>();
     const merged = [...kwPlaces, ...addrPlaces].filter((p) => {
