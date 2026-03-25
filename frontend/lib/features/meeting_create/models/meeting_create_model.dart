@@ -32,7 +32,7 @@ class MeetingCreateModel {
       'placeLat': placeLat,
       'placeLng': placeLng,
       'placeAddress': placeAddress,
-      'scheduledAt': scheduledAt.toIso8601String(),
+      'scheduledAt': scheduledAt.toUtc().toIso8601String(),
       'maxMembers': maxMembers,
       'gender': gender,
       'ageGroups': ageGroups,

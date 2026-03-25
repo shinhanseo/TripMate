@@ -354,7 +354,9 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
   }
 
   static String _formatDateTime(DateTime dateTime) {
-    return '${dateTime.month}/${dateTime.day} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    final local = dateTime.toLocal();
+
+    return '${local.month}/${local.day} ${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
   }
 
   static String _genderLabel(String gender) {
