@@ -59,6 +59,7 @@ router.get("/", authRequired, async (req: AuthRequest, res: Response) => {
       left join meeting_members mm
         on mm.meeting_id = m.id
       where m.status = 'open'
+        and m.scheduled_at >= now()
         and ($1::text is null or m.category = $1)
         and ($2::text is null or m.gender = $2 or m.gender = 'any')
         and (
@@ -113,7 +114,7 @@ router.get("/home", async (_req, res: Response) => {
       `
       select id, category, region_primary
       from meetings
-      where status = 'open'
+      where status = 'open' and and m.scheduled_at >= now()
       order by id asc
       `
     );
