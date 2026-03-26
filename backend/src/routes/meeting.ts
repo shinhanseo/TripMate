@@ -114,7 +114,7 @@ router.get("/home", async (_req, res: Response) => {
       `
       select id, category, region_primary
       from meetings
-      where status = 'open' and and m.scheduled_at >= now()
+      where status = 'open' and scheduled_at >= now()
       order by id asc
       `
     );
@@ -186,6 +186,9 @@ router.get("/:id", authRequired, async (req: AuthRequest, res: Response) => {
         m.host_user_id,
         m.title,
         m.place_text,
+        m.place_lat,
+        m.place_lng,
+        m.address as place_address,
         m.region_primary,
         m.region_secondary,
         m.scheduled_at,
@@ -240,6 +243,9 @@ router.get("/:id", authRequired, async (req: AuthRequest, res: Response) => {
         currentUserId: userId,
         title: row.title,
         placeText: row.place_text,
+        placeLat: row.place_lat,
+        placeLng: row.place_lng,
+        placeAddress: row.place_address,
         regionPrimary: row.region_primary,
         regionSecondary: row.region_secondary,
         scheduledAt: row.scheduled_at,
@@ -356,6 +362,7 @@ router.post("/", authRequired, async (req: AuthRequest, res: Response) => {
         place_text,
         place_lat,
         place_lng,
+        address,
         region_primary,
         region_secondary,
         scheduled_at,
@@ -368,9 +375,9 @@ router.post("/", authRequired, async (req: AuthRequest, res: Response) => {
       )
       values (
         $1, $2, $3, $4, $5, $6, $7,
-        $8, $9, $10, $11, $12, $13, 'open'
+        $8, $9, $10, $11, $12, $13, $14, 'open'
       )
-      returning id, host_user_id, title, place_text, place_lat, place_lng,
+      returning id, host_user_id, title, place_text, place_lat, place_lng, address,
                 region_primary, region_secondary, scheduled_at, max_members,
                 gender, age_groups, category, description, status, created_at, updated_at
       `,
@@ -380,6 +387,7 @@ router.post("/", authRequired, async (req: AuthRequest, res: Response) => {
         placeText,
         placeLat ?? null,
         placeLng ?? null,
+        placeAddress,
         regionPrimary,
         regionSecondary ?? null,
         scheduledAt,
@@ -418,6 +426,7 @@ router.post("/", authRequired, async (req: AuthRequest, res: Response) => {
           placeText: meeting.place_text,
           placeLat: meeting.place_lat,
           placeLng: meeting.place_lng,
+          placeAddress: meeting.address,
           regionPrimary: meeting.region_primary,
           regionSecondary: meeting.region_secondary,
           scheduledAt: meeting.scheduled_at,
@@ -456,38 +465,91 @@ router.patch("/:id", authRequired, async (req: AuthRequest, res: Response) => {
     placeText,
     placeLat,
     placeLng,
-    regionPrimary,
-    regionSecondary,
+    placeAddress,
     scheduledAt,
     maxMembers,
     gender,
     ageGroups,
     category,
     description,
-    status,
   } = req.body;
+
+  if (
+    typeof title !== "string" ||
+    !title.trim() ||
+    typeof placeText !== "string" ||
+    !placeText.trim() ||
+    typeof placeAddress !== "string" ||
+    !placeAddress.trim() ||
+    typeof scheduledAt !== "string" ||
+    !scheduledAt.trim() ||
+    typeof description !== "string" ||
+    !description.trim()
+  ) {
+    return fail(res, 400, "invalid text fields");
+  }
+
+  const latNum = Number(placeLat);
+  const lngNum = Number(placeLng);
+  const maxMembersNum = Number(maxMembers);
+
+  if (!Number.isFinite(latNum) || !Number.isFinite(lngNum)) {
+    return fail(res, 400, "invalid place coordinates");
+  }
+
+  if (!Number.isInteger(maxMembersNum) || maxMembersNum < 2) {
+    return fail(res, 400, "invalid maxMembers");
+  }
+
+  if (typeof gender !== "string" || !isValidGender(gender)) {
+    return fail(res, 400, "invalid gender");
+  }
 
   if (!isValidAgeGroups(ageGroups)) {
     return fail(res, 400, "invalid ageGroups");
   }
 
+  if (!isValidCategory(category)) {
+    return fail(res, 400, "invalid category");
+  }
+
+  const scheduledDate = new Date(scheduledAt);
+  if (Number.isNaN(scheduledDate.getTime())) {
+    return fail(res, 400, "invalid scheduledAt");
+  }
+
+  const { regionPrimary, regionSecondary } = getJejuRegionInfo(placeAddress);
+
+  if (!regionPrimary) {
+    return fail(res, 400, "제주도 지역만 선택할 수 있습니다.");
+  }
+
+  if (!isValidRegion(regionPrimary)) {
+    return fail(res, 400, "invalid regionPrimary");
+  }
+
   const client = await pool.connect();
 
   try {
+    await client.query("begin");
+
     const meetingCheckRes = await client.query(
       `
       select id, host_user_id
       from meetings
       where id = $1
+      for update
       `,
       [meetingId]
     );
 
     if (meetingCheckRes.rowCount === 0) {
+      await client.query("rollback");
       return fail(res, 404, "meeting not found");
     }
 
-    if (meetingCheckRes.rows[0].host_user_id !== userId) {
+    if (Number(meetingCheckRes.rows[0].host_user_id) !== userId) {
+      await client.query("rollback");
       return fail(res, 403, "forbidden");
     }
 
@@ -499,15 +561,15 @@ router.patch("/:id", authRequired, async (req: AuthRequest, res: Response) => {
         place_text = $2,
         place_lat = $3,
         place_lng = $4,
-        region_primary = $5,
-        region_secondary = $6,
-        scheduled_at = $7,
-        max_members = $8,
-        gender = $9,
-        age_groups = $10,
-        category = $11,
-        description = $12,
-        status = $13,
+        address = $5,
+        region_primary = $6,
+        region_secondary = $7,
+        scheduled_at = $8,
+        max_members = $9,
+        gender = $10,
+        age_groups = $11,
+        category = $12,
+        description = $13,
         updated_at = now()
       where id = $14
       returning
@@ -517,6 +579,7 @@ router.patch("/:id", authRequired, async (req: AuthRequest, res: Response) => {
         place_text,
         place_lat,
         place_lng,
+        address,
         region_primary,
         region_secondary,
         scheduled_at,
@@ -532,17 +595,17 @@ router.patch("/:id", authRequired, async (req: AuthRequest, res: Response) => {
       [
         title,
         placeText,
-        placeLat ?? null,
-        placeLng ?? null,
+        latNum,
+        lngNum,
+        placeAddress,
         regionPrimary,
         regionSecondary ?? null,
         scheduledAt,
-        maxMembers,
+        maxMembersNum,
         gender,
         ageGroups,
         category,
         description,
-        status,
         meetingId,
       ]
     );
@@ -558,6 +621,8 @@ router.patch("/:id", authRequired, async (req: AuthRequest, res: Response) => {
       [meetingId]
     );
 
+    await client.query("commit");
+
     return ok(res, {
       item: {
         id: meeting.id,
@@ -566,6 +631,7 @@ router.patch("/:id", authRequired, async (req: AuthRequest, res: Response) => {
         placeText: meeting.place_text,
         placeLat: meeting.place_lat,
         placeLng: meeting.place_lng,
+        placeAddress: meeting.address,
         regionPrimary: meeting.region_primary,
         regionSecondary: meeting.region_secondary,
         scheduledAt: meeting.scheduled_at,
@@ -581,12 +647,14 @@ router.patch("/:id", authRequired, async (req: AuthRequest, res: Response) => {
       },
     });
   } catch (error: any) {
+    await client.query("rollback");
     console.error("PATCH /meetings/:id error:", error);
     return fail(res, 500, "failed to update meeting");
   } finally {
     client.release();
   }
 });
+
 
 // 동행 삭제
 router.delete("/:id", authRequired, async (req: AuthRequest, res: Response) => {
