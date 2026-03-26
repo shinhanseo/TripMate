@@ -81,7 +81,7 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
                   if (value == 'edit') {
                     Navigator.pushNamed(
                       context,
-                      '/meetingedit',
+                      '/meetingupdate',
                       arguments: {
                         'meetingId': widget.meetingId,
                         'detail': detail,
