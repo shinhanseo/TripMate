@@ -79,7 +79,14 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
                 ),
                 onSelected: (value) {
                   if (value == 'edit') {
-                    // 수정 페이지 이동
+                    Navigator.pushNamed(
+                      context,
+                      '/meetingedit',
+                      arguments: {
+                        'meetingId': widget.meetingId,
+                        'detail': detail,
+                      },
+                    );
                   }
                 },
                 itemBuilder: (context) => const [
