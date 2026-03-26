@@ -139,6 +139,7 @@ class AppRouter {
             ),
             child: const MeetingCreatePage(),
           ),
+          settings: settings,
         );
 
       case meetingdetail:
@@ -183,6 +184,7 @@ class AppRouter {
             ),
             child: const MeetingUpdatePage(),
           ),
+          settings: settings,
         );
 
       default:
