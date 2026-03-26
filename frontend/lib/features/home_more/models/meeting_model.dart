@@ -95,6 +95,9 @@ class MeetingDetailModel {
   final int currentUserId;
   final String title;
   final String placeText;
+  final double placeLat;
+  final double placeLng;
+  final String placeAddress;
   final String regionPrimary;
   final String? regionSecondary;
   final DateTime scheduledAt;
@@ -113,6 +116,9 @@ class MeetingDetailModel {
     required this.currentUserId,
     required this.title,
     required this.placeText,
+    required this.placeLat,
+    required this.placeLng,
+    required this.placeAddress,
     required this.regionPrimary,
     required this.regionSecondary,
     required this.scheduledAt,
@@ -133,6 +139,9 @@ class MeetingDetailModel {
       currentUserId: int.parse(json['currentUserId'].toString()),
       title: json['title'] as String,
       placeText: json['placeText'] as String,
+      placeLat: double.parse(json['placeLat'].toString()),
+      placeLng: double.parse(json['placeLng'].toString()),
+      placeAddress: json['placeAddress'] as String,
       regionPrimary: json['regionPrimary'] as String,
       regionSecondary: json['regionSecondary'] as String?,
       scheduledAt: DateTime.parse(json['scheduledAt'] as String),
