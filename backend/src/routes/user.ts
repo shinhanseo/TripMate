@@ -6,6 +6,21 @@ import { isValidNickname, validateProfileInput } from "../modules/users/user-inv
 
 const router = Router();
 
+function ageRangeMapper(value: String) {
+  switch (value) {
+    case '20-29':
+      return '20대';
+    case '30-39':
+      return '30대';
+    case '40-49':
+      return '40대';
+    case '50-59':
+      return '50대';
+    default:
+      return value;
+  }
+}
+
 router.patch("/nickname", authRequired, async (req: AuthRequest, res) => {
   const userId = req.user!.userId;
   const rawNickname = req.body.nickname;
@@ -329,6 +344,55 @@ router.get("/me", authRequired, async (req: AuthRequest, res) => {
       gender: user.gender ?? null,
       age_range: user.age_range ?? null,
       profile_completed: profileCompleted,
+    });
+  } catch (error: any) {
+    return fail(res, 500, "failed to get my profile", error?.message);
+  } finally {
+    client.release();
+  }
+})
+
+router.get("/mypage", authRequired, async (req: AuthRequest, res) => {
+  const userId = req.user!.userId;
+
+  const client = await pool.connect();
+  try {
+    const userRes = await client.query(
+      `
+      select
+        u.id,
+        up.nickname,
+        up.gender,
+        up.age_range
+        up.profile_image,
+        up.favorite_tags,
+        up.bio,
+        up.category
+      from users u
+      left join user_profiles up
+        on up.user_id = u.id
+      where u.id = $1
+      limit 1
+      `,
+      [userId]
+    );
+
+    if (userRes.rowCount === 0) {
+      return fail(res, 400, "user not fount");
+    }
+
+    const user = userRes.rows[0];
+
+    const ageRange = ageRangeMapper(user.age_range);
+
+    return ok(res, {
+      id: user.id,
+      nickname: user.nickname,
+      gender: user.gender,
+      age_range: ageRange,
+      bio: user.bio ?? null,
+      favoriteTags: user.favorite_tags,
+      profileImage: user.profile_image,
     });
   } catch (error: any) {
     return fail(res, 500, "failed to get my profile", error?.message);
