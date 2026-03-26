@@ -5,6 +5,7 @@ import '../../auth/services/auth_api.dart';
 import '../../auth/services/token_storage.dart';
 import '../models/meeting_model.dart';
 import '../../meeting_create/models/meeting_create_model.dart';
+import '../../meeting_create/models/meeting_update_model.dart';
 
 class MeetingApi {
   final String baseUrl;
@@ -132,7 +133,7 @@ class MeetingApi {
 
   Future<void> updateMeeting({
     required int meetingId,
-    required MeetingCreateModel meeting,
+    required MeetingUpdateModel meeting,
   }) async {
     final url = Uri.parse('$baseUrl/api/meeting/$meetingId');
 
