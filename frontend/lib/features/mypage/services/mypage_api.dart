@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../../auth/services/auth_api.dart';
 import '../../auth/services/token_storage.dart';
 import '../models/mypage_model.dart';
+import '../../home_more/models/meeting_model.dart';
 
 class MyPageApi {
   final String baseUrl;
@@ -28,6 +29,48 @@ class MyPageApi {
     }
 
     throw Exception(json['message'] ?? '내 정보를 불러오지 못했습니다.');
+  }
+
+  Future<MeetingListModel> getTotalMeetings() async {
+    final url = Uri.parse('$baseUrl/api/user/meeting/total');
+
+    http.Response response = await _authorizedGet(url);
+
+    final Map<String, dynamic> json = jsonDecode(response.body);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return MeetingListModel.fromJson(json['data']);
+    }
+
+    throw Exception(json['message'] ?? '동행 목록을 불러오지 못했습니다.');
+  }
+
+  Future<MeetingListModel> getHostMeetings() async {
+    final url = Uri.parse('$baseUrl/api/user/meeting/host');
+
+    http.Response response = await _authorizedGet(url);
+
+    final Map<String, dynamic> json = jsonDecode(response.body);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return MeetingListModel.fromJson(json['data']);
+    }
+
+    throw Exception(json['message'] ?? '동행 목록을 불러오지 못했습니다.');
+  }
+
+  Future<MeetingListModel> getIngMeetings() async {
+    final url = Uri.parse('$baseUrl/api/user/meeting/ing');
+
+    http.Response response = await _authorizedGet(url);
+
+    final Map<String, dynamic> json = jsonDecode(response.body);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return MeetingListModel.fromJson(json['data']);
+    }
+
+    throw Exception(json['message'] ?? '동행 목록을 불러오지 못했습니다.');
   }
 
   Future<http.Response> _authorizedGet(Uri url) async {
