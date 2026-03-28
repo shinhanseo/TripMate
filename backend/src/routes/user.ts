@@ -3,6 +3,7 @@ import { authRequired, AuthRequest } from "../middleware/authRequired";
 import { pool } from "../db";
 import { ok, fail } from "../utils/response";
 import { isValidNickname, validateProfileInput } from "../modules/users/user-invalid";
+import { isValidAgeGroup, isValidCategory, isValidGender, isValidRegion } from "../modules/meetings/meetings-invalid";
 
 const router = Router();
 
@@ -85,6 +86,34 @@ router.patch("/nickname", authRequired, async (req: AuthRequest, res) => {
 router.get("/meeting/total", authRequired, async (req: AuthRequest, res) => {
   const userId = req.user!.userId;
 
+  const category = String(req.query.category || "").trim();
+  const gender = String(req.query.gender || "").trim();
+  const ageGroup = String(req.query.ageGroup || "").trim();
+  const regionPrimary = String(req.query.regionPrimary || "").trim();
+  const q = String(req.query.q || "").trim();
+
+  const categoryFilter = category ? category : null;
+  const genderFilter = gender && gender !== "any" ? gender : null;
+  const ageGroupFilter = ageGroup && ageGroup !== "any" ? ageGroup : null;
+  const regionPrimaryFilter = regionPrimary ? regionPrimary : null;
+  const keywordFilter = q ? `%${q}%` : null;
+
+  if (category && !isValidCategory(category)) {
+    return fail(res, 400, "invalid category");
+  }
+
+  if (gender && !isValidGender(gender)) {
+    return fail(res, 400, "invalid gender");
+  }
+
+  if (ageGroup && !isValidAgeGroup(ageGroup)) {
+    return fail(res, 400, "invalid ageGroup");
+  }
+
+  if (regionPrimary && !isValidRegion(regionPrimary)) {
+    return fail(res, 400, "invalid region");
+  }
+
   const client = await pool.connect();
 
   try {
@@ -109,6 +138,23 @@ router.get("/meeting/total", authRequired, async (req: AuthRequest, res) => {
       left join meeting_members mm_all
         on mm_all.meeting_id = m.id
       where m.status <> 'cancelled'
+        and m.scheduled_at >= now()
+        and ($2::text is null or m.category = $2)
+        and ($3::text is null or m.gender = $3 or m.gender = 'any')
+        and (
+          $4::text is null
+          or m.age_groups = array['any']::text[]
+          or $4 = any(m.age_groups)
+        )
+        and (
+          $5::text is null
+          or m.title ilike $5
+          or m.place_text ilike $5
+          or m.description ilike $5
+        )
+        and (
+          $6::text is null or m.region_primary = $6
+        )
       group by
         m.id,
         m.title,
@@ -121,7 +167,7 @@ router.get("/meeting/total", authRequired, async (req: AuthRequest, res) => {
         m.region_primary
       order by m.scheduled_at asc, m.id desc;
       `,
-      [userId]
+      [userId, categoryFilter, genderFilter, ageGroupFilter, keywordFilter, regionPrimaryFilter]
     );
 
     return ok(res, {
@@ -150,6 +196,34 @@ router.get("/meeting/total", authRequired, async (req: AuthRequest, res) => {
 router.get("/meeting/host", authRequired, async (req: AuthRequest, res) => {
   const userId = req.user!.userId;
 
+  const category = String(req.query.category || "").trim();
+  const gender = String(req.query.gender || "").trim();
+  const ageGroup = String(req.query.ageGroup || "").trim();
+  const regionPrimary = String(req.query.regionPrimary || "").trim();
+  const q = String(req.query.q || "").trim();
+
+  const categoryFilter = category ? category : null;
+  const genderFilter = gender && gender !== "any" ? gender : null;
+  const ageGroupFilter = ageGroup && ageGroup !== "any" ? ageGroup : null;
+  const regionPrimaryFilter = regionPrimary ? regionPrimary : null;
+  const keywordFilter = q ? `%${q}%` : null;
+
+  if (category && !isValidCategory(category)) {
+    return fail(res, 400, "invalid category");
+  }
+
+  if (gender && !isValidGender(gender)) {
+    return fail(res, 400, "invalid gender");
+  }
+
+  if (ageGroup && !isValidAgeGroup(ageGroup)) {
+    return fail(res, 400, "invalid ageGroup");
+  }
+
+  if (regionPrimary && !isValidRegion(regionPrimary)) {
+    return fail(res, 400, "invalid region");
+  }
+
   const client = await pool.connect();
 
   try {
@@ -175,6 +249,23 @@ router.get("/meeting/host", authRequired, async (req: AuthRequest, res) => {
       left join meeting_members mm_all
         on mm_all.meeting_id = m.id
       where m.status <> 'cancelled'
+      and m.scheduled_at >= now()
+        and ($2::text is null or m.category = $2)
+        and ($3::text is null or m.gender = $3 or m.gender = 'any')
+        and (
+          $4::text is null
+          or m.age_groups = array['any']::text[]
+          or $4 = any(m.age_groups)
+        )
+        and (
+          $5::text is null
+          or m.title ilike $5
+          or m.place_text ilike $5
+          or m.description ilike $5
+        )
+        and (
+          $6::text is null or m.region_primary = $6
+        )
       group by
         m.id,
         m.title,
@@ -187,7 +278,7 @@ router.get("/meeting/host", authRequired, async (req: AuthRequest, res) => {
         m.region_primary
       order by m.scheduled_at asc, m.id desc;
       `,
-      [userId]
+      [userId, categoryFilter, genderFilter, ageGroupFilter, keywordFilter, regionPrimaryFilter]
     );
 
     return ok(res, {
@@ -216,6 +307,34 @@ router.get("/meeting/host", authRequired, async (req: AuthRequest, res) => {
 router.get("/meeting/ing", authRequired, async (req: AuthRequest, res) => {
   const userId = req.user!.userId;
 
+  const category = String(req.query.category || "").trim();
+  const gender = String(req.query.gender || "").trim();
+  const ageGroup = String(req.query.ageGroup || "").trim();
+  const regionPrimary = String(req.query.regionPrimary || "").trim();
+  const q = String(req.query.q || "").trim();
+
+  const categoryFilter = category ? category : null;
+  const genderFilter = gender && gender !== "any" ? gender : null;
+  const ageGroupFilter = ageGroup && ageGroup !== "any" ? ageGroup : null;
+  const regionPrimaryFilter = regionPrimary ? regionPrimary : null;
+  const keywordFilter = q ? `%${q}%` : null;
+
+  if (category && !isValidCategory(category)) {
+    return fail(res, 400, "invalid category");
+  }
+
+  if (gender && !isValidGender(gender)) {
+    return fail(res, 400, "invalid gender");
+  }
+
+  if (ageGroup && !isValidAgeGroup(ageGroup)) {
+    return fail(res, 400, "invalid ageGroup");
+  }
+
+  if (regionPrimary && !isValidRegion(regionPrimary)) {
+    return fail(res, 400, "invalid region");
+  }
+
   const client = await pool.connect();
 
   try {
@@ -241,6 +360,23 @@ router.get("/meeting/ing", authRequired, async (req: AuthRequest, res) => {
         on mm_all.meeting_id = m.id
       where m.status = 'open'
         and m.scheduled_at >= now()
+        and m.scheduled_at >= now()
+        and ($2::text is null or m.category = $2)
+        and ($3::text is null or m.gender = $3 or m.gender = 'any')
+        and (
+          $4::text is null
+          or m.age_groups = array['any']::text[]
+          or $4 = any(m.age_groups)
+        )
+        and (
+          $5::text is null
+          or m.title ilike $5
+          or m.place_text ilike $5
+          or m.description ilike $5
+        )
+        and (
+          $6::text is null or m.region_primary = $6
+        )
       group by
         m.id,
         m.title,
@@ -253,7 +389,7 @@ router.get("/meeting/ing", authRequired, async (req: AuthRequest, res) => {
         m.region_primary
       order by m.scheduled_at asc, m.id desc;
       `,
-      [userId]
+      [userId, categoryFilter, genderFilter, ageGroupFilter, keywordFilter, regionPrimaryFilter]
     );
 
     return ok(res, {
