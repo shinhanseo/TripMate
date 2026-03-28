@@ -656,7 +656,7 @@ router.patch("/:id", authRequired, async (req: AuthRequest, res: Response) => {
 });
 
 
-// 동행 삭제
+// 동행 삭제(soft delete)
 router.delete("/:id", authRequired, async (req: AuthRequest, res: Response) => {
   const meetingId = Number(req.params.id);
   const userId = req.user!.userId;
@@ -672,7 +672,7 @@ router.delete("/:id", authRequired, async (req: AuthRequest, res: Response) => {
 
     const meetingCheckRes = await client.query(
       `
-      select id, host_user_id
+      select id, host_user_id, status
       from meetings
       where id = $1
       for update
@@ -688,6 +688,11 @@ router.delete("/:id", authRequired, async (req: AuthRequest, res: Response) => {
     if (Number(meetingCheckRes.rows[0].host_user_id) !== userId) {
       await client.query("rollback");
       return fail(res, 403, "forbidden");
+    }
+
+    if (meetingCheckRes.rows[0].status === "cancelled") {
+      await client.query("rollback");
+      return fail(res, 409, "meeting already cancelled");
     }
 
     const meetingMemberCheckRes = await client.query(
@@ -708,15 +713,9 @@ router.delete("/:id", authRequired, async (req: AuthRequest, res: Response) => {
 
     await client.query(
       `
-      delete from meeting_members
-      where meeting_id = $1
-      `,
-      [meetingId]
-    );
-
-    await client.query(
-      `
-      delete from meetings
+      update meetings
+      set status = 'cancelled',
+          updated_at = now()
       where id = $1
       `,
       [meetingId]
@@ -725,16 +724,17 @@ router.delete("/:id", authRequired, async (req: AuthRequest, res: Response) => {
     await client.query("commit");
 
     return ok(res, {
-      message: "meeting deleted",
+      message: "meeting cancelled",
     });
   } catch (error: any) {
     await client.query("rollback");
     console.error("DELETE /meetings/:id error:", error);
-    return fail(res, 500, "failed to delete meeting");
+    return fail(res, 500, "failed to cancel meeting");
   } finally {
     client.release();
   }
 });
+
 
 // 동행 참가
 function normalizeGender(gender: string | null | undefined) {
