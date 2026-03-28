@@ -39,116 +39,125 @@ class _MyPageState extends State<MyPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('마이페이지')),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (vm.myInfo != null)
-            _UserProfile(
-              nickname: vm.myInfo!.nickname,
-              gender: vm.myInfo!.gender,
-              ageRange: vm.myInfo!.ageRange,
-              bio: vm.myInfo!.bio,
-              favoriteTags: vm.myInfo!.favoriteTags,
-              profileImage: vm.myInfo!.profileImage,
+      backgroundColor: const Color(0xffffffff),
+      appBar: AppBar(
+        backgroundColor: const Color(0xffffffff),
+        surfaceTintColor: const Color(0xffffffff),
+        scrolledUnderElevation: 0,
+        title: const Text('마이페이지'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (vm.myInfo != null)
+              _UserProfile(
+                nickname: vm.myInfo!.nickname,
+                gender: vm.myInfo!.gender,
+                ageRange: vm.myInfo!.ageRange,
+                bio: vm.myInfo!.bio,
+                favoriteTags: vm.myInfo!.favoriteTags,
+                profileImage: vm.myInfo!.profileImage,
+              ),
+
+            const SizedBox(height: 18),
+
+            SizedBox(
+              height: 24,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF35C7B5), Color(0xFFD7E76C)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.14),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
+                  onPressed: () {},
+                  child: const Text(
+                    '프로필 편집하기',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
             ),
 
-          const SizedBox(height: 18),
+            const SizedBox(height: 22),
 
-          SizedBox(
-            height: 24,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF35C7B5), Color(0xFFD7E76C)],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: _CountItem(count: me.totalCount, label: '전체 참여한 동행'),
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.14),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: ElevatedButton(
-                onPressed: () {},
-                child: const Text(
-                  '프로필 편집하기',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
+                Expanded(
+                  child: _CountItem(count: me.hostCount, label: '내가 만든 동행'),
                 ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 22),
-
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: _CountItem(count: me.totalCount, label: '전체 참여한 동행'),
-              ),
-              Expanded(
-                child: _CountItem(count: me.hostCount, label: '내가 만든 동행'),
-              ),
-              Expanded(
-                child: _CountItem(count: me.ingCount, label: '현재 참가한 동행'),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 22),
-
-          _MyMeetingItem(label: '전체 참여한 동행', onTap: () {}),
-
-          const SizedBox(height: 4),
-          const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
-          const SizedBox(height: 4),
-
-          _MyMeetingItem(label: '내가 만든 동행', onTap: () {}),
-
-          const SizedBox(height: 4),
-          const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
-          const SizedBox(height: 4),
-
-          _MyMeetingItem(label: '현재 참가한 동행', onTap: () {}),
-
-          const SizedBox(height: 4),
-          const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
-
-          const SizedBox(height: 22),
-
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Color(0xFFE5E7EB)),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
+                Expanded(
+                  child: _CountItem(count: me.ingCount, label: '현재 참가한 동행'),
                 ),
               ],
             ),
-            child: const Text(
-              '로그아웃',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Colors.red,
+
+            const SizedBox(height: 22),
+
+            _MyMeetingItem(label: '전체 참여한 동행', onTap: () {}),
+
+            const SizedBox(height: 4),
+            const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
+            const SizedBox(height: 4),
+
+            _MyMeetingItem(label: '내가 만든 동행', onTap: () {}),
+
+            const SizedBox(height: 4),
+            const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
+            const SizedBox(height: 4),
+
+            _MyMeetingItem(label: '현재 참가한 동행', onTap: () {}),
+
+            const SizedBox(height: 4),
+            const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
+
+            const SizedBox(height: 22),
+
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Color(0xFFE5E7EB)),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Text(
+                '로그아웃',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.red,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
