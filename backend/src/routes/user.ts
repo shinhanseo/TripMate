@@ -21,6 +21,16 @@ function ageRangeMapper(value: String) {
   }
 }
 
+function genderMapper(value: String) {
+  if (value == 'M' || value == 'm' || value == 'man')
+    return '남성'
+
+  if (value == 'F' || value == 'f' || value == 'female')
+    return '여성'
+
+  return value;
+}
+
 router.patch("/nickname", authRequired, async (req: AuthRequest, res) => {
   const userId = req.user!.userId;
   const rawNickname = req.body.nickname;
@@ -415,11 +425,12 @@ router.get("/mypage", authRequired, async (req: AuthRequest, res) => {
     const user = userRes.rows[0];
     const counts = countRes.rows[0];
     const ageRange = ageRangeMapper(user.age_range);
+    const gender = genderMapper(user.gender);
 
     return ok(res, {
       id: user.id,
       nickname: user.nickname,
-      gender: user.gender,
+      gender: gender,
       ageRange: ageRange,
       bio: user.bio ?? null,
       favoriteTags: user.favorite_tags ?? [],
