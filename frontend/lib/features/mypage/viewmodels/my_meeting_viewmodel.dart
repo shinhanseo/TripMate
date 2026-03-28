@@ -7,17 +7,23 @@ enum MyMeetingType { total, host, ing }
 class MyMeetingViewModel extends ChangeNotifier {
   final MyPageApi myPageApi;
   final MyMeetingType type;
+
   MyMeetingViewModel({required this.myPageApi, required this.type});
 
-  MeetingListModel? totalList;
-  MeetingListModel? hostList;
-  MeetingListModel? ingList;
+  MeetingListModel? meetingList;
 
   bool isLoading = false;
   String? errorMessage;
+
+  String? selectedCategory;
+  String? selectedGender;
+  String? selectedAgeGroup;
+  String? selectedRegionPrimary;
+  String? searchQuery;
+
   bool isSuccess = false;
 
-  Future<void> loadTotalMeeting() async {
+  Future<void> loadMeetings({bool forceRefresh = false}) async {
     if (isLoading) return;
 
     try {
@@ -25,61 +31,78 @@ class MyMeetingViewModel extends ChangeNotifier {
       errorMessage = null;
       notifyListeners();
 
-      final result = await myPageApi.getTotalMeetings();
+      late final MeetingListModel result;
 
-      totalList = result;
+      switch (type) {
+        case MyMeetingType.total:
+          result = await myPageApi.getTotalMeetings(
+            category: selectedCategory,
+            gender: selectedGender,
+            ageGroup: selectedAgeGroup,
+            regionPrimary: selectedRegionPrimary,
+            query: searchQuery,
+          );
+          break;
+        case MyMeetingType.host:
+          result = await myPageApi.getHostMeetings(
+            category: selectedCategory,
+            gender: selectedGender,
+            ageGroup: selectedAgeGroup,
+            regionPrimary: selectedRegionPrimary,
+            query: searchQuery,
+          );
+          break;
+        case MyMeetingType.ing:
+          result = await myPageApi.getIngMeetings(
+            category: selectedCategory,
+            gender: selectedGender,
+            ageGroup: selectedAgeGroup,
+            regionPrimary: selectedRegionPrimary,
+            query: searchQuery,
+          );
+          break;
+      }
+
+      meetingList = result;
       isSuccess = true;
     } catch (e) {
-      errorMessage = e.toString().replaceFirst('Exception : ', '');
+      errorMessage = e.toString().replaceFirst('Exception: ', '');
       isSuccess = false;
-      totalList = null;
+      meetingList = null;
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> loadHostMeeting() async {
-    if (isLoading) return;
-
-    try {
-      isLoading = true;
-      errorMessage = null;
-      notifyListeners();
-
-      final result = await myPageApi.getHostMeetings();
-
-      hostList = result;
-      isSuccess = true;
-    } catch (e) {
-      errorMessage = e.toString().replaceFirst('Exception : ', '');
-      isSuccess = false;
-      hostList = null;
-    } finally {
-      isLoading = false;
-      notifyListeners();
-    }
+  Future<void> refresh() async {
+    await loadMeetings(forceRefresh: true);
   }
 
-  Future<void> loadIngMeeting() async {
-    if (isLoading) return;
+  Future<void> applyFilters({
+    String? category,
+    String? gender,
+    String? ageGroup,
+    String? regionPrimary,
+    String? query,
+  }) async {
+    selectedCategory = category;
+    selectedGender = gender;
+    selectedAgeGroup = ageGroup;
+    selectedRegionPrimary = regionPrimary;
+    searchQuery = query;
+    isSuccess = false;
 
-    try {
-      isLoading = true;
-      errorMessage = null;
-      notifyListeners();
+    await loadMeetings(forceRefresh: true);
+  }
 
-      final result = await myPageApi.getTotalMeetings();
-
-      ingList = result;
-      isSuccess = true;
-    } catch (e) {
-      errorMessage = e.toString().replaceFirst('Exception : ', '');
-      isSuccess = false;
-      ingList = null;
-    } finally {
-      isLoading = false;
-      notifyListeners();
-    }
+  void clearFilters() {
+    selectedCategory = null;
+    selectedGender = null;
+    selectedAgeGroup = null;
+    selectedRegionPrimary = null;
+    searchQuery = null;
+    isSuccess = false;
+    notifyListeners();
   }
 }
