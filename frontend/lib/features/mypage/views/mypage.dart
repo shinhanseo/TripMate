@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/widgets/bottom_nav_bar.dart';
 import '../viewmodels/mypage_viewmodel.dart';
+import '../viewmodels/my_meeting_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 class MyPage extends StatefulWidget {
@@ -45,6 +46,7 @@ class _MyPageState extends State<MyPage> {
         surfaceTintColor: const Color(0xffffffff),
         scrolledUnderElevation: 0,
         title: const Text('마이페이지'),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -126,19 +128,46 @@ class _MyPageState extends State<MyPage> {
 
             const SizedBox(height: 42),
 
-            _MyMeetingItem(label: '전체 참여한 동행', onTap: () {}),
+            _MyMeetingItem(
+              label: '전체 참여한 동행',
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  '/mymeetinglist',
+                  arguments: MyMeetingType.total,
+                );
+              },
+            ),
 
             const SizedBox(height: 8),
             const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
             const SizedBox(height: 8),
 
-            _MyMeetingItem(label: '내가 만든 동행', onTap: () {}),
+            _MyMeetingItem(
+              label: '내가 만든 동행',
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  '/mymeetinglist',
+                  arguments: MyMeetingType.host,
+                );
+              },
+            ),
 
             const SizedBox(height: 8),
             const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
             const SizedBox(height: 8),
 
-            _MyMeetingItem(label: '현재 참가한 동행', onTap: () {}),
+            _MyMeetingItem(
+              label: '현재 참가한 동행',
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  '/mymeetinglist',
+                  arguments: MyMeetingType.ing,
+                );
+              },
+            ),
 
             const SizedBox(height: 8),
             const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
