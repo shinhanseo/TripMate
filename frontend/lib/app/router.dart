@@ -26,6 +26,8 @@ import '../features/chat/views/chat_page.dart';
 import '../features/mypage/views/mypage.dart';
 import '../features/mypage/viewmodels/mypage_viewmodel.dart';
 import '../features/mypage/services/mypage_api.dart';
+import '../features/mypage/views/my_meeting_list_view.dart';
+import '../features/mypage/viewmodels/my_meeting_viewmodel.dart';
 
 import '../features/meeting_create/views/meeting_create_page.dart';
 import '../features/meeting_create/views/meeting_place_search_page.dart';
@@ -48,6 +50,8 @@ class AppRouter {
   static const String meetingdetail = '/meetingdetail';
   static const String meetingplacesearch = '/meetingplacesearch';
   static const String meetingupdate = '/meetingupdate';
+  static const String mymeetinglist = '/mymeetinglist';
+
   static final baseUrl = dotenv.env['BASE_URL']!;
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -195,6 +199,24 @@ class AppRouter {
               tokenStorage: TokenStorage(),
             ),
             child: const MeetingUpdatePage(),
+          ),
+          settings: settings,
+        );
+
+      case mymeetinglist:
+        final type = settings.arguments as MyMeetingType;
+
+        return MaterialPageRoute(
+          builder: (_) => ChangeNotifierProvider(
+            create: (_) => MyMeetingViewModel(
+              myPageApi: MyPageApi(
+                baseUrl: baseUrl,
+                authApi: AuthApi(baseUrl: baseUrl),
+                tokenStorage: TokenStorage(),
+              ),
+              type: type,
+            ),
+            child: MyMeetingListPage(type: type),
           ),
           settings: settings,
         );
