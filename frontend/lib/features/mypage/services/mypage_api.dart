@@ -17,8 +17,35 @@ class MyPageApi {
     required this.tokenStorage,
   });
 
-  Future<MyPageModel> getMe() async {
-    final url = Uri.parse('$baseUrl/api/user/mypage');
+  Future<MyPageModel> getMe({
+    String? category,
+    String? gender,
+    String? ageGroup,
+    String? regionPrimary,
+    String? query,
+  }) async {
+    final queryParams = <String, String>{};
+
+    if (category != null && category.isNotEmpty) {
+      queryParams['category'] = category;
+    }
+    if (gender != null && gender.isNotEmpty) {
+      queryParams['gender'] = gender;
+    }
+    if (ageGroup != null && ageGroup.isNotEmpty) {
+      queryParams['ageGroup'] = ageGroup;
+    }
+    if (regionPrimary != null && regionPrimary.isNotEmpty) {
+      queryParams['regionPrimary'] = regionPrimary;
+    }
+    if (query != null && query.isNotEmpty) {
+      queryParams['q'] = query;
+    }
+
+    final url = Uri.parse(
+      '$baseUrl/api/user/mypage',
+    ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+    ;
 
     http.Response response = await _authorizedGet(url);
 
