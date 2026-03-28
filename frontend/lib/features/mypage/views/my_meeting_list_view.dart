@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../viewmodels/my_meeting_viewmodel.dart';
 import 'package:provider/provider.dart';
 
-import '../../home_more/viewmodels/home_more_viewmodel.dart';
 import '../../home_more/widgets/age_group_chip.dart';
 import '../../home_more/widgets/category_chip.dart';
 import '../../home_more/widgets/gender_chip.dart';
