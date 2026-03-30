@@ -181,6 +181,52 @@ class MyPageApi {
     throw Exception(json['message'] ?? '프로필 수정에 실패했습니다.');
   }
 
+  Future<String> uploadProfileImage(String filePath) async {
+    final url = Uri.parse('$baseUrl/api/upload/profile-image');
+
+    String? accessToken = await tokenStorage.getAccessToken();
+
+    var request = http.MultipartRequest('POST', url);
+    request.headers['Authorization'] = 'Bearer $accessToken';
+    request.files.add(await http.MultipartFile.fromPath('image', filePath));
+
+    var streamedResponse = await request.send();
+    var response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode == 401) {
+      final refreshToken = await tokenStorage.getRefreshToken();
+
+      if (refreshToken == null || refreshToken.isEmpty) {
+        throw Exception('로그인이 만료되었습니다.');
+      }
+
+      final tokenResponse = await authApi.updateAccessToken(
+        refreshToken: refreshToken,
+      );
+
+      final newAccessToken = tokenResponse['access_token'] as String;
+      final newRefreshToken = tokenResponse['refresh_token'] as String;
+
+      await tokenStorage.saveAccessToken(newAccessToken);
+      await tokenStorage.saveRefreshToken(newRefreshToken);
+
+      request = http.MultipartRequest('POST', url);
+      request.headers['Authorization'] = 'Bearer $newAccessToken';
+      request.files.add(await http.MultipartFile.fromPath('image', filePath));
+
+      streamedResponse = await request.send();
+      response = await http.Response.fromStream(streamedResponse);
+    }
+
+    final Map<String, dynamic> json = jsonDecode(response.body);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return json['data']['imageUrl'] as String;
+    }
+
+    throw Exception(json['message'] ?? '프로필 이미지 업로드에 실패했습니다.');
+  }
+
   Future<http.Response> _authorizedGet(Uri url) async {
     String? accessToken = await tokenStorage.getAccessToken();
 
