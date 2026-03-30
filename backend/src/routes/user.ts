@@ -4,6 +4,7 @@ import { pool } from "../db";
 import { ok, fail } from "../utils/response";
 import { isValidNickname, validateProfileInput } from "../modules/users/user-invalid";
 import { isValidAgeGroup, isValidCategory, isValidGender, isValidRegion } from "../modules/meetings/meetings-invalid";
+import { prisma } from "../lib/prisma";
 
 const router = Router();
 
@@ -46,41 +47,41 @@ router.patch("/nickname", authRequired, async (req: AuthRequest, res) => {
     return fail(res, 400, "invalid nickname");
   }
 
-  const client = await pool.connect();
-
   try {
-    const nicknameRes = await client.query(
-      `
-      update user_profiles
-      set nickname = $1,
-          updated_at = now()
-      where user_id = $2
-      returning user_id, nickname
-      `,
-      [nickname, userId]
-    );
-
-    if (nicknameRes.rowCount === 0) {
-      return fail(res, 404, "profile not found");
-    }
+    const profile = await prisma.userProfile.update({
+      where: {
+        userId: BigInt(userId),
+      },
+      data: {
+        nickname,
+        updatedAt: new Date(),
+      },
+      select: {
+        userId: true,
+        nickname: true,
+      },
+    });
 
     return ok(res, {
       item: {
-        id: nicknameRes.rows[0].user_id,
-        nickname: nicknameRes.rows[0].nickname,
+        id: Number(profile.userId),
+        nickname: profile.nickname,
         profile_completed: true,
       },
     });
   } catch (error: any) {
-    if (error.code === "23505") {
+    if (error.code === "P2002") {
       return fail(res, 409, "duplicate nickname");
     }
 
+    if (error.code === "P2025") {
+      return fail(res, 404, "profile not found");
+    }
+
     return fail(res, 500, "failed to set nickname", error.message);
-  } finally {
-    client.release();
   }
 });
+
 
 // 내가 참여한 미팅 가져오기
 router.get("/meeting/total", authRequired, async (req: AuthRequest, res) => {
@@ -422,164 +423,144 @@ router.patch("/profile", authRequired, async (req: AuthRequest, res) => {
 
   const { nickname, bio, category, profileImageUrl } = profileInput;
 
-  const client = await pool.connect();
-
   try {
-    await client.query(
-      `
-      update user_profiles
-      set nickname = $1,
-          bio = $2,
-          favorite_tags = $3,
-          profile_image_url = $4, 
-          updated_at = now()
-      where user_id = $5
-      `,
-      [nickname, bio, category, profileImageUrl, userId]
-    );
-
-    return ok(res, {
-      item: {
+    const profile = await prisma.userProfile.update({
+      where: {
+        userId: BigInt(userId),
+      },
+      data: {
         nickname,
         bio,
-        category,
+        favoriteTags: category,
         profileImageUrl,
-      }
-    }, 201);
-  } catch {
-    return fail(res, 400, "falied to set profile");
-  } finally {
-    client.release();
+        updatedAt: new Date(),
+      },
+    });
+
+    return ok(
+      res,
+      {
+        item: {
+          nickname: profile.nickname,
+          bio: profile.bio,
+          category: profile.favoriteTags,
+          profileImageUrl: profile.profileImageUrl,
+        },
+      },
+      201,
+    );
+  } catch (error: any) {
+    return fail(res, 400, "falied to set profile", error?.message);
   }
-})
+});
+
 
 router.get("/me", authRequired, async (req: AuthRequest, res) => {
   const userId = req.user!.userId;
 
-  const client = await pool.connect();
   try {
-    const userRes = await client.query(
-      `
-      select
-        u.id,
-        up.nickname,
-        up.gender,
-        up.age_range
-      from users u
-      left join user_profiles up
-        on up.user_id = u.id
-      where u.id = $1
-      limit 1
-      `,
-      [userId]
-    );
+    const user = await prisma.user.findUnique({
+      where: {
+        id: BigInt(userId),
+      },
+      include: {
+        profile: true,
+      },
+    });
 
-    if (userRes.rowCount === 0) {
-      return fail(res, 400, "user not fount");
+    if (!user) {
+      return fail(res, 400, "user not found");
     }
 
-    const user = userRes.rows[0];
-    const profileCompleted = !!user.nickname;
+    const profileCompleted = !!user.profile?.nickname;
 
     return ok(res, {
-      id: user.id,
-      nickname: user.nickname ?? null,
-      gender: user.gender ?? null,
-      age_range: user.age_range ?? null,
+      id: Number(user.id),
+      nickname: user.profile?.nickname ?? null,
+      gender: user.profile?.gender ?? null,
+      age_range: user.profile?.ageRange ?? null,
       profile_completed: profileCompleted,
     });
   } catch (error: any) {
     return fail(res, 500, "failed to get my profile", error?.message);
-  } finally {
-    client.release();
   }
-})
+});
+
 
 router.get("/mypage", authRequired, async (req: AuthRequest, res) => {
   const userId = req.user!.userId;
+  const prismaUserId = BigInt(userId);
 
-  const client = await pool.connect();
   try {
-    const userRes = await client.query(
-      `
-      select
-        u.id,
-        up.nickname,
-        up.gender,
-        up.age_range,
-        up.profile_image_url,
-        up.favorite_tags,
-        up.bio
-      from users u
-      left join user_profiles up
-        on up.user_id = u.id
-      where u.id = $1
-      limit 1
-      `,
-      [userId]
-    );
+    const user = await prisma.user.findUnique({
+      where: { id: prismaUserId },
+      include: {
+        profile: true,
+      },
+    });
 
-    if (userRes.rowCount === 0) {
+    if (!user) {
       return fail(res, 400, "user not found");
     }
 
-    const countRes = await client.query(
-      `
-      select
-        (
-          select count(*)
-          from meetings m
-          where m.host_user_id = $1
-            and m.status <> 'cancelled'
-        ) as host_count,
-        (
-          select count(*)
-          from meeting_members mm
-          join meetings m
-            on m.id = mm.meeting_id
-          where mm.user_id = $1
-            and mm.status = 'joined'
-            and m.status <> 'cancelled'
-        ) as total_count,
-        (
-          select count(*)
-          from meeting_members mm
-          join meetings m
-            on m.id = mm.meeting_id
-          where mm.user_id = $1
-            and mm.status = 'joined'
-            and m.status = 'open'
-            and m.scheduled_at >= now()
-        ) as ing_count
-      `,
-      [userId]
-    );
+    const [hostCount, totalCount, ingCount] = await Promise.all([
+      prisma.meeting.count({
+        where: {
+          hostUserId: prismaUserId,
+          status: {
+            not: "cancelled",
+          },
+        },
+      }),
 
-    const user = userRes.rows[0];
-    const counts = countRes.rows[0];
-    const ageRange = ageRangeMapper(user.age_range);
-    const gender = genderMapper(user.gender);
+      prisma.meetingMember.count({
+        where: {
+          userId: prismaUserId,
+          status: "joined",
+          meeting: {
+            status: {
+              not: "cancelled",
+            },
+          },
+        },
+      }),
+
+      prisma.meetingMember.count({
+        where: {
+          userId: prismaUserId,
+          status: "joined",
+          meeting: {
+            status: "open",
+            scheduledAt: {
+              gte: new Date(),
+            },
+          },
+        },
+      }),
+    ]);
+
+    const ageRange = ageRangeMapper(user.profile?.ageRange ?? "");
+    const gender = genderMapper(user.profile?.gender ?? "");
 
     return ok(res, {
-      id: user.id,
-      nickname: user.nickname,
-      gender: gender,
-      ageRange: ageRange,
-      bio: user.bio ?? null,
-      favoriteTags: user.favorite_tags ?? [],
-      profileImage: user.profile_image_url ?? '',
+      id: Number(user.id),
+      nickname: user.profile?.nickname ?? null,
+      gender,
+      ageRange,
+      bio: user.profile?.bio ?? null,
+      favoriteTags: user.profile?.favoriteTags ?? [],
+      profileImage: user.profile?.profileImageUrl ?? "",
       meetingCounts: {
-        host: Number(counts.host_count),
-        total: Number(counts.total_count),
-        ing: Number(counts.ing_count),
+        host: hostCount,
+        total: totalCount,
+        ing: ingCount,
       },
     });
   } catch (error: any) {
     return fail(res, 500, "failed to get my profile", error?.message);
-  } finally {
-    client.release();
   }
 });
+
 
 
 export default router;
