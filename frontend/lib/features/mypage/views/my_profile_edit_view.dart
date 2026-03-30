@@ -5,6 +5,7 @@ import '../models/profile_edit_model.dart';
 import '../viewmodels/profile_edit_viewmodel.dart';
 import '../widgets/category_chip.dart';
 import '../../../core/widgets/custom_message_dialog.dart';
+import 'package:image_picker/image_picker.dart';
 
 class MyProfileEditPage extends StatefulWidget {
   const MyProfileEditPage({super.key});
@@ -20,6 +21,9 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
   bool _isInitialized = false;
   List<String> selectedCategories = [];
 
+  String? _profileImageUrl;
+  bool _isUploadingImage = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -30,7 +34,7 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
 
     if (args != null) {
       final myInfo = args as MyPageModel;
-
+      _profileImageUrl = myInfo.profileImage;
       _nicknameController.text = myInfo.nickname;
       _bioController.text = myInfo.bio ?? '';
       selectedCategories = List<String>.from(myInfo.favoriteTags ?? []);
@@ -44,6 +48,49 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
     _nicknameController.dispose();
     _bioController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    final picker = ImagePicker();
+
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+    );
+
+    if (pickedFile == null) return;
+
+    try {
+      setState(() {
+        _isUploadingImage = true;
+      });
+
+      final imageUrl = await context
+          .read<ProfileEditViewModel>()
+          .uploadProfileImage(pickedFile.path);
+
+      if (!mounted) return;
+
+      setState(() {
+        _profileImageUrl = imageUrl;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (_) => CustomMessageDialog(
+          title: '업로드할 수 없어요.',
+          message: e.toString().replaceFirst('Exception: ', ''),
+        ),
+      );
+    } finally {
+      if (!mounted) return;
+
+      setState(() {
+        _isUploadingImage = false;
+      });
+    }
   }
 
   @override
@@ -105,10 +152,11 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
                 child: CircleAvatar(
                   radius: 48,
                   backgroundColor: const Color(0xffF3F4F6),
-                  backgroundImage: myInfo.profileImage.isNotEmpty
-                      ? NetworkImage(myInfo.profileImage)
+                  backgroundImage:
+                      (_profileImageUrl != null && _profileImageUrl!.isNotEmpty)
+                      ? NetworkImage(_profileImageUrl!)
                       : null,
-                  child: myInfo.profileImage.isEmpty
+                  child: (_profileImageUrl == null || _profileImageUrl!.isEmpty)
                       ? const Icon(Icons.person, color: Color(0xff9CA3AF))
                       : null,
                 ),
@@ -137,7 +185,9 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
                       ],
                     ),
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        await _pickAndUploadImage();
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
@@ -370,7 +420,7 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
                     nickname: _nicknameController.text.trim(),
                     bio: _bioController.text.trim(),
                     category: selectedCategories,
-                    profileImageUrl: myInfo.profileImage,
+                    profileImageUrl: _profileImageUrl ?? '',
                   );
 
                   try {
