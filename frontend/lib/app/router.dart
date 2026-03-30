@@ -28,6 +28,8 @@ import '../features/mypage/viewmodels/mypage_viewmodel.dart';
 import '../features/mypage/services/mypage_api.dart';
 import '../features/mypage/views/my_meeting_list_view.dart';
 import '../features/mypage/viewmodels/my_meeting_viewmodel.dart';
+import '../features/mypage/views/my_profile_edit_view.dart';
+import '../features/mypage/viewmodels/profile_edit_viewmodel.dart';
 
 import '../features/meeting_create/views/meeting_create_page.dart';
 import '../features/meeting_create/views/meeting_place_search_page.dart';
@@ -51,6 +53,7 @@ class AppRouter {
   static const String meetingplacesearch = '/meetingplacesearch';
   static const String meetingupdate = '/meetingupdate';
   static const String mymeetinglist = '/mymeetinglist';
+  static const String myprofileedit = '/myprofileedit';
 
   static final baseUrl = dotenv.env['BASE_URL']!;
 
@@ -217,6 +220,21 @@ class AppRouter {
               type: type,
             ),
             child: MyMeetingListPage(type: type),
+          ),
+          settings: settings,
+        );
+
+      case myprofileedit:
+        return MaterialPageRoute(
+          builder: (_) => ChangeNotifierProvider(
+            create: (_) => ProfileEditViewModel(
+              myPageApi: MyPageApi(
+                baseUrl: baseUrl,
+                authApi: AuthApi(baseUrl: baseUrl),
+                tokenStorage: TokenStorage(),
+              ),
+            ),
+            child: const MyProfileEditPage(),
           ),
           settings: settings,
         );
