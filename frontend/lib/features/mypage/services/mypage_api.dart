@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../../auth/services/auth_api.dart';
 import '../../auth/services/token_storage.dart';
 import '../models/mypage_model.dart';
+import '../models/profile_edit_model.dart';
 import '../../home_more/models/meeting_model.dart';
 
 class MyPageApi {
@@ -149,6 +150,37 @@ class MyPageApi {
     throw Exception(json['message'] ?? '동행 목록을 불러오지 못했습니다.');
   }
 
+  Future<ProfileEditModel> editUser({required ProfileEditModel edit}) async {
+    final url = Uri.parse('$baseUrl/api/user/profile');
+
+    final profile = ProfileEditModel(
+      nickname: edit.nickname,
+      bio: edit.bio,
+      category: edit.category,
+      profileImageUrl: edit.profileImageUrl,
+    );
+
+    final response = await _authorizedPatch(
+      url,
+      body: jsonEncode(profile.toJson()),
+    );
+
+    final Map<String, dynamic> json = jsonDecode(response.body);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return ProfileEditModel(
+        nickname: json['data']['item']['nickname'] as String,
+        bio: json['data']['item']['bio'] as String,
+        category: (json['data']['item']['category'] as List<dynamic>)
+            .map((e) => e.toString())
+            .toList(),
+        profileImageUrl: json['data']['item']['profileImageUrl'] as String,
+      );
+    }
+
+    throw Exception(json['message'] ?? '프로필 수정에 실패했습니다.');
+  }
+
   Future<http.Response> _authorizedGet(Uri url) async {
     String? accessToken = await tokenStorage.getAccessToken();
 
@@ -186,6 +218,50 @@ class MyPageApi {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $newAccessToken',
       },
+    );
+
+    return response;
+  }
+
+  Future<http.Response> _authorizedPatch(Uri url, {Object? body}) async {
+    String? accessToken = await tokenStorage.getAccessToken();
+
+    http.Response response = await http.patch(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: body,
+    );
+
+    if (response.statusCode != 401) {
+      return response;
+    }
+
+    final refreshToken = await tokenStorage.getRefreshToken();
+
+    if (refreshToken == null || refreshToken.isEmpty) {
+      throw Exception('로그인이 만료되었습니다.');
+    }
+
+    final tokenResponse = await authApi.updateAccessToken(
+      refreshToken: refreshToken,
+    );
+
+    final newAccessToken = tokenResponse['access_token'] as String;
+    final newRefreshToken = tokenResponse['refresh_token'] as String;
+
+    await tokenStorage.saveAccessToken(newAccessToken);
+    await tokenStorage.saveRefreshToken(newRefreshToken);
+
+    response = await http.patch(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $newAccessToken',
+      },
+      body: body,
     );
 
     return response;
