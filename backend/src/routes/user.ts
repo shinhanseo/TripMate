@@ -432,7 +432,7 @@ router.patch("/profile", authRequired, async (req: AuthRequest, res) => {
           bio = $2,
           favorite_tags = $3,
           profile_image_url = $4, 
-          updated_now = now()
+          updated_at = now()
       where user_id = $5
       `,
       [nickname, bio, category, profileImageUrl, userId]
