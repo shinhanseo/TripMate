@@ -22,7 +22,6 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
   List<String> selectedCategories = [];
 
   String? _profileImageUrl;
-  bool _isUploadingImage = false;
 
   @override
   void didChangeDependencies() {
@@ -61,10 +60,6 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
     if (pickedFile == null) return;
 
     try {
-      setState(() {
-        _isUploadingImage = true;
-      });
-
       final imageUrl = await context
           .read<ProfileEditViewModel>()
           .uploadProfileImage(pickedFile.path);
@@ -86,10 +81,6 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
       );
     } finally {
       if (!mounted) return;
-
-      setState(() {
-        _isUploadingImage = false;
-      });
     }
   }
 
