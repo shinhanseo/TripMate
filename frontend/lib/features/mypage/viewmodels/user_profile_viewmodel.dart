@@ -1,0 +1,35 @@
+import 'package:flutter/material.dart';
+import '../services/mypage_api.dart';
+import '../models/mypage_model.dart';
+
+class UserProfileViewModel extends ChangeNotifier {
+  final MyPageApi myPageApi;
+
+  UserProfileViewModel({required this.myPageApi});
+
+  MyPageModel? userProfile;
+  bool isLoading = false;
+  String? errorMessage;
+  bool isSuccess = false;
+
+  Future<void> getUserProfile(int userId) async {
+    try {
+      if (isLoading) return;
+
+      isLoading = true;
+      errorMessage = null;
+      notifyListeners();
+
+      final result = await myPageApi.getUserProfile(userId: userId);
+      userProfile = result;
+      isSuccess = true;
+    } catch (e) {
+      errorMessage = e.toString().replaceFirst('Exception: ', '');
+      isSuccess = false;
+      userProfile = null;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+}
