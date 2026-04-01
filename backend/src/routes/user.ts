@@ -561,6 +561,78 @@ router.get("/mypage", authRequired, async (req: AuthRequest, res) => {
   }
 });
 
+router.get("/:id/profile", authRequired, async (req: AuthRequest, res) => {
+  const userId = Number(req.params.id);
+  const prismaUserId = BigInt(userId);
 
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: prismaUserId },
+      include: {
+        profile: true,
+      },
+    });
+
+    if (!user) {
+      return fail(res, 400, "user not found");
+    }
+
+    const [hostCount, totalCount, ingCount] = await Promise.all([
+      prisma.meeting.count({
+        where: {
+          hostUserId: prismaUserId,
+          status: {
+            not: "cancelled",
+          },
+        },
+      }),
+
+      prisma.meetingMember.count({
+        where: {
+          userId: prismaUserId,
+          status: "joined",
+          meeting: {
+            status: {
+              not: "cancelled",
+            },
+          },
+        },
+      }),
+
+      prisma.meetingMember.count({
+        where: {
+          userId: prismaUserId,
+          status: "joined",
+          meeting: {
+            status: "open",
+            scheduledAt: {
+              gte: new Date(),
+            },
+          },
+        },
+      }),
+    ]);
+
+    const ageRange = ageRangeMapper(user.profile?.ageRange ?? "");
+    const gender = genderMapper(user.profile?.gender ?? "");
+
+    return ok(res, {
+      id: Number(user.id),
+      nickname: user.profile?.nickname ?? null,
+      gender,
+      ageRange,
+      bio: user.profile?.bio ?? null,
+      favoriteTags: user.profile?.favoriteTags ?? [],
+      profileImage: user.profile?.profileImageUrl ?? "",
+      meetingCounts: {
+        host: hostCount,
+        total: totalCount,
+        ing: ingCount,
+      },
+    });
+  } catch (error: any) {
+    return fail(res, 500, "failed to get my profile", error?.message);
+  }
+});
 
 export default router;
