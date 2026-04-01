@@ -227,6 +227,20 @@ class MyPageApi {
     throw Exception(json['message'] ?? '프로필 이미지 업로드에 실패했습니다.');
   }
 
+  Future<MyPageModel> getUserProfile({required int userId}) async {
+    final url = Uri.parse('$baseUrl/api/user/$userId/profile');
+
+    http.Response response = await _authorizedGet(url);
+
+    final Map<String, dynamic> json = jsonDecode(response.body);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return MyPageModel.fromJson(json['data']);
+    }
+
+    throw Exception(json['message'] ?? '유저 프로필을 불러오지 못했습니다.');
+  }
+
   Future<http.Response> _authorizedGet(Uri url) async {
     String? accessToken = await tokenStorage.getAccessToken();
 
