@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/mypage_model.dart';
 import '../viewmodels/mypage_viewmodel.dart';
 import '../viewmodels/my_meeting_viewmodel.dart';
+import '../../auth/viewmodels/auth_state.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -183,29 +184,46 @@ class _MyPageState extends State<MyPage> {
 
               const SizedBox(height: 42),
 
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 42,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 8,
-                      offset: Offset(0, 4),
+                  onTap: () async {
+                    await context.read<AuthState>().logout();
+
+                    if (!context.mounted) return;
+
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/login',
+                      (route) => false,
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 42,
+                      vertical: 8,
                     ),
-                  ],
-                ),
-                child: const Text(
-                  '로그아웃',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.red,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Text(
+                      '로그아웃',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.red,
+                      ),
+                    ),
                   ),
                 ),
               ),
