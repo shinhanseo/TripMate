@@ -30,6 +30,8 @@ import '../features/mypage/views/my_meeting_list_view.dart';
 import '../features/mypage/viewmodels/my_meeting_viewmodel.dart';
 import '../features/mypage/views/my_profile_edit_view.dart';
 import '../features/mypage/viewmodels/profile_edit_viewmodel.dart';
+import '../features/mypage/views/user_profile_view.dart';
+import '../features/mypage/viewmodels/user_profile_viewmodel.dart';
 
 import '../features/meeting_create/views/meeting_create_page.dart';
 import '../features/meeting_create/views/meeting_place_search_page.dart';
@@ -54,6 +56,7 @@ class AppRouter {
   static const String meetingupdate = '/meetingupdate';
   static const String mymeetinglist = '/mymeetinglist';
   static const String myprofileedit = '/myprofileedit';
+  static const String userprofile = '/userprofile';
 
   static final baseUrl = dotenv.env['BASE_URL']!;
 
@@ -235,6 +238,23 @@ class AppRouter {
               ),
             ),
             child: const MyProfileEditPage(),
+          ),
+          settings: settings,
+        );
+
+      case userprofile:
+        final userId = settings.arguments as int;
+
+        return MaterialPageRoute(
+          builder: (_) => ChangeNotifierProvider(
+            create: (_) => UserProfileViewModel(
+              myPageApi: MyPageApi(
+                baseUrl: baseUrl,
+                authApi: AuthApi(baseUrl: baseUrl),
+                tokenStorage: TokenStorage(),
+              ),
+            ),
+            child: UserProfileView(userId: userId),
           ),
           settings: settings,
         );
