@@ -95,4 +95,22 @@ class AuthApi {
 
     throw Exception(json['message'] ?? '닉네임 설정에 실패했습니다.');
   }
+
+  Future<void> logout({required String refreshToken}) async {
+    final url = Uri.parse('$baseUrl/api/auth/logout');
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'refresh_token': refreshToken}),
+    );
+
+    final Map<String, dynamic> json = jsonDecode(response.body);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return;
+    }
+
+    throw Exception(json['message'] ?? '로그아웃에 실패했습니다.');
+  }
 }
