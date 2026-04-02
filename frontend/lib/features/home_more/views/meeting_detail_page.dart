@@ -318,6 +318,10 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
                                 detail.placeLat,
                                 detail.placeLng,
                               ),
+                              caption: NOverlayCaption(
+                                text: detail.placeText,
+                                textSize: 16,
+                              ),
                             ),
                           );
                         },
