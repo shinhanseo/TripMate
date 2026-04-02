@@ -343,7 +343,8 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (_) => MeetingMapPage(
-                                  title: detail.placeText,
+                                  title: detail.title,
+                                  placeText: detail.placeText,
                                   lat: detail.placeLat,
                                   lng: detail.placeLng,
                                 ),
