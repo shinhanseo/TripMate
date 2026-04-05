@@ -242,7 +242,7 @@ class MyPageApi {
     throw Exception(json['message'] ?? '유저 프로필을 불러오지 못했습니다.');
   }
 
-  Future<TotalMeetingMapModel> getTotalMeetingMap() async {
+  Future<List<TotalMeetingMapModel>> getTotalMeetingMap() async {
     final url = Uri.parse('$baseUrl/api/user/map');
 
     http.Response response = await _authorizedGet(url);
@@ -250,7 +250,11 @@ class MyPageApi {
     final Map<String, dynamic> json = jsonDecode(response.body);
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      return TotalMeetingMapModel.fromJson(json['data']);
+      final items = json['data']['items'] as List<dynamic>;
+
+      return items
+          .map((e) => TotalMeetingMapModel.fromJson(e as Map<String, dynamic>))
+          .toList();
     }
 
     throw Exception(json['message'] ?? '동행 지도를 불러오지 못했습니다.');

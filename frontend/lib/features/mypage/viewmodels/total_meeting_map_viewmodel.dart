@@ -7,7 +7,7 @@ class TotalMeetingMapViewModel extends ChangeNotifier {
 
   TotalMeetingMapViewModel({required this.myPageApi});
 
-  TotalMeetingMapModel? totalMeetingMap;
+  List<TotalMeetingMapModel> totalMeetingMap = [];
   bool isLoading = false;
   String? errorMessage;
 
@@ -23,8 +23,8 @@ class TotalMeetingMapViewModel extends ChangeNotifier {
 
       totalMeetingMap = result;
     } catch (e) {
-      errorMessage = e.toString().replaceFirst('Exception : ', '');
-      totalMeetingMap = null;
+      errorMessage = e.toString().replaceFirst('Exception: ', '');
+      totalMeetingMap = [];
     } finally {
       isLoading = false;
       notifyListeners();
