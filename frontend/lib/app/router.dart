@@ -32,6 +32,8 @@ import '../features/mypage/views/my_profile_edit_view.dart';
 import '../features/mypage/viewmodels/profile_edit_viewmodel.dart';
 import '../features/mypage/views/user_profile_view.dart';
 import '../features/mypage/viewmodels/user_profile_viewmodel.dart';
+import '../features/mypage/views/total_meeting_map_view.dart';
+import '../features/mypage/viewmodels/total_meeting_map_viewmodel.dart';
 
 import '../features/meeting_create/views/meeting_create_page.dart';
 import '../features/meeting_create/views/meeting_place_search_page.dart';
@@ -57,6 +59,7 @@ class AppRouter {
   static const String mymeetinglist = '/mymeetinglist';
   static const String myprofileedit = '/myprofileedit';
   static const String userprofile = '/userprofile';
+  static const String totalmeetingmap = '/totalmeetingmap';
 
   static final baseUrl = dotenv.env['BASE_URL']!;
 
@@ -255,6 +258,21 @@ class AppRouter {
               ),
             ),
             child: UserProfileView(userId: userId),
+          ),
+          settings: settings,
+        );
+
+      case totalmeetingmap:
+        return MaterialPageRoute(
+          builder: (_) => ChangeNotifierProvider(
+            create: (_) => TotalMeetingMapViewModel(
+              myPageApi: MyPageApi(
+                baseUrl: baseUrl,
+                authApi: AuthApi(baseUrl: baseUrl),
+                tokenStorage: TokenStorage(),
+              ),
+            ),
+            child: const TotalMeetingMapView(),
           ),
           settings: settings,
         );
