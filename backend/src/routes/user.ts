@@ -647,7 +647,7 @@ router.get("/map", authRequired, async (req: AuthRequest, res) => {
         m.title,
         m.place_text,
         m.place_lat,
-        m.place_lng,
+        m.place_lng
       from meetings m
       join meeting_members mm
         on mm.meeting_id = m.id
