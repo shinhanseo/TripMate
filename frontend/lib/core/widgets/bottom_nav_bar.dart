@@ -10,7 +10,7 @@ class BottomNavBar extends StatelessWidget {
 
     switch (index) {
       case 0:
-        Navigator.pushReplacementNamed(context, '/chat');
+        Navigator.pushReplacementNamed(context, '/chatlist');
         break;
       case 1:
         Navigator.pushReplacementNamed(context, '/home');
