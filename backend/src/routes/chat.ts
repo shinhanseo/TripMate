@@ -5,7 +5,6 @@ import { ok, fail } from "../utils/response";
 
 const router = Router();
 
-// 내가 joined 한 시점 이후 메시지 조회
 router.get(
   "/meetings/:meetingId/messages",
   authRequired,
@@ -235,6 +234,86 @@ router.post(
     }
   }
 );
+
+router.get("/rooms", authRequired, async (req: AuthRequest, res: Response) => {
+  const userId = req.user!.userId;
+
+  const client = await pool.connect();
+
+  try {
+    const roomRes = await client.query(
+      `
+      select
+        cr.id as room_id,
+        cr.meeting_id,
+        cr.created_at as room_created_at,
+        cr.updated_at as room_updated_at,
+        crm.joined_at as chat_joined_at,
+        m.title as meeting_title,
+        m.place_text,
+        m.scheduled_at,
+        m.status as meeting_status,
+        lm.id as last_message_id,
+        lm.sender_id as last_message_sender_id,
+        lm.content as last_message_content,
+        lm.created_at as last_message_created_at,
+        up.nickname as last_message_sender_nickname
+      from chat_room_members crm
+      join chat_rooms cr
+        on cr.id = crm.room_id
+      join meetings m
+        on m.id = cr.meeting_id
+      left join lateral (
+        select
+          cm.id,
+          cm.sender_id,
+          cm.content,
+          cm.created_at
+        from chat_messages cm
+        where cm.room_id = cr.id
+          and cm.created_at >= crm.joined_at
+        order by cm.created_at desc, cm.id desc
+        limit 1
+      ) lm on true
+      left join user_profiles up
+        on up.user_id = lm.sender_id
+      where crm.user_id = $1
+      order by
+        coalesce(lm.created_at, cr.updated_at) desc,
+        cr.id desc
+      `,
+      [userId]
+    );
+
+    return ok(res, {
+      items: roomRes.rows.map((row) => ({
+        roomId: Number(row.room_id),
+        meetingId: Number(row.meeting_id),
+        meetingTitle: row.meeting_title,
+        placeText: row.place_text,
+        scheduledAt: row.scheduled_at,
+        meetingStatus: row.meeting_status,
+        chatJoinedAt: row.chat_joined_at,
+        roomCreatedAt: row.room_created_at,
+        roomUpdatedAt: row.room_updated_at,
+        lastMessageId:
+          row.last_message_id === null ? null : Number(row.last_message_id),
+        lastMessageSenderId:
+          row.last_message_sender_id === null
+            ? null
+            : Number(row.last_message_sender_id),
+        lastMessageSenderNickname: row.last_message_sender_nickname,
+        lastMessageContent: row.last_message_content,
+        lastMessageCreatedAt: row.last_message_created_at,
+      })),
+    });
+  } catch (error: any) {
+    console.error("GET /chat/rooms error:", error);
+    return fail(res, 500, "failed to load chat rooms");
+  } finally {
+    client.release();
+  }
+});
 
 
 export default router;
