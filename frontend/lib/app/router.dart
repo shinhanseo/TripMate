@@ -21,7 +21,10 @@ import '../features/home_more/viewmodels/meeting_detail_viewmodel.dart';
 import '../features/home_more/services/meeting_api.dart';
 
 import '../features/splash/views/splash_page.dart';
-import '../features/chat/views/chat_page.dart';
+
+import '../features/chat/views/chat_list_page.dart';
+import '../features/chat/viewmodels/chat_list_viewmodel.dart';
+import '../features/chat/services/chat_api.dart';
 
 import '../features/mypage/views/mypage.dart';
 import '../features/mypage/viewmodels/mypage_viewmodel.dart';
@@ -49,7 +52,7 @@ class AppRouter {
   static const String login = '/login';
   static const String nickname = '/nickname';
   static const String splash = '/splash';
-  static const String chat = '/chat';
+  static const String chatlist = '/chatlist';
   static const String mypage = '/mypage';
   static const String homemore = '/homemore';
   static const String meetingcreate = '/meetingcreate';
@@ -114,9 +117,18 @@ class AppRouter {
           settings: settings,
         );
 
-      case chat:
+      case chatlist:
         return MaterialPageRoute(
-          builder: (_) => const ChatPage(),
+          builder: (_) => ChangeNotifierProvider(
+            create: (_) => ChatListViewModel(
+              chatApi: ChatApi(
+                baseUrl: baseUrl,
+                authApi: AuthApi(baseUrl: baseUrl),
+                tokenStorage: TokenStorage(),
+              ),
+            ),
+            child: const ChatListPage(),
+          ),
           settings: settings,
         );
 
