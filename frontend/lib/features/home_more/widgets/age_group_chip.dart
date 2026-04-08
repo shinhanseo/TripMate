@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 
 class AgeGroupChip extends StatelessWidget {
   final String? selectedAgeGroup;
@@ -44,7 +45,7 @@ class AgeGroupChip extends StatelessWidget {
             label: Text(
               label,
               style: TextStyle(
-                color: isSelected ? const Color(0xFF2563EB) : Colors.black87,
+                color: isSelected ? AppColors.blue600 : Colors.black87,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -56,15 +57,13 @@ class AgeGroupChip extends StatelessWidget {
                 onChanged(value);
               }
             },
-            backgroundColor: const Color(0xffffffff),
-            selectedColor: const Color(0xFFE8F0FE),
+            backgroundColor: AppColors.white,
+            selectedColor: AppColors.blue50,
             showCheckmark: false,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
               side: BorderSide(
-                color: isSelected
-                    ? const Color(0xFF93C5FD)
-                    : const Color(0xffD1D5DB),
+                color: isSelected ? AppColors.blue300 : AppColors.gray300,
                 width: 1.2,
               ),
             ),

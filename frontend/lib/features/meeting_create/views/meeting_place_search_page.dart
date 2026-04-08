@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/widgets/custom_message_dialog.dart';
@@ -64,10 +65,10 @@ class _MeetingPlaceSearchPageState extends State<MeetingPlaceSearchPage> {
     final vm = context.watch<PlaceSearchViewModel>();
 
     return Scaffold(
-      backgroundColor: const Color(0xffffffff),
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xffffffff),
-        surfaceTintColor: const Color(0xffffffff),
+        backgroundColor: AppColors.white,
+        surfaceTintColor: AppColors.white,
         scrolledUnderElevation: 0,
         title: const Text(
           '장소 검색',
@@ -102,21 +103,21 @@ class _MeetingPlaceSearchPageState extends State<MeetingPlaceSearchPage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(22),
                     borderSide: const BorderSide(
-                      color: Color(0xFF2DD4BF),
+                      color: AppColors.mint,
                       width: 1.5,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(22),
                     borderSide: const BorderSide(
-                      color: Color(0xFF7AD8C4),
+                      color: AppColors.brandMint,
                       width: 1.5,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(22),
                     borderSide: const BorderSide(
-                      color: Color(0xFF7AD8C4),
+                      color: AppColors.brandMint,
                       width: 1.5,
                     ),
                   ),
@@ -146,7 +147,7 @@ class _MeetingPlaceSearchPageState extends State<MeetingPlaceSearchPage> {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xff8D8D8D),
+                            color: AppColors.neutralGray,
                           ),
                         ),
                       )
@@ -195,7 +196,7 @@ class _PlaceResultTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xffE5E7EB), width: 1.2),
+            border: Border.all(color: AppColors.gray200, width: 1.2),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.08),
@@ -221,7 +222,7 @@ class _PlaceResultTile extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xff6B7280),
+                  color: AppColors.gray500,
                   height: 1.4,
                 ),
               ),
@@ -232,9 +233,7 @@ class _PlaceResultTile extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: isJejuRegion
-                      ? const Color(0xffF1F5F9)
-                      : const Color(0xffFEF2F2),
+                  color: isJejuRegion ? AppColors.slate100 : AppColors.red50,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
@@ -243,8 +242,8 @@ class _PlaceResultTile extends StatelessWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: isJejuRegion
-                        ? const Color(0xff475467)
-                        : const Color(0xffB42318),
+                        ? AppColors.slateGray
+                        : AppColors.red700,
                   ),
                 ),
               ),

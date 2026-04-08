@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/total_meeting_map_viewmodel.dart';
@@ -44,10 +45,10 @@ class _TotalMeetingMapViewState extends State<TotalMeetingMapView> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xffffffff),
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xffffffff),
-        surfaceTintColor: const Color(0xffffffff),
+        backgroundColor: AppColors.white,
+        surfaceTintColor: AppColors.white,
         scrolledUnderElevation: 0,
         title: const Text('동행 지도 확인하기'),
       ),

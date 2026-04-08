@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/core/widgets/bottom_nav_bar.dart';
 
@@ -57,7 +58,7 @@ class _HomeMorePageState extends State<HomeMorePage> {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xffffffff),
+      backgroundColor: AppColors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -83,7 +84,7 @@ class _HomeMorePageState extends State<HomeMorePage> {
                           width: 42,
                           height: 5,
                           decoration: BoxDecoration(
-                            color: const Color(0xffD1D5DB),
+                            color: AppColors.gray300,
                             borderRadius: BorderRadius.circular(999),
                           ),
                         ),
@@ -190,7 +191,7 @@ class _HomeMorePageState extends State<HomeMorePage> {
                               style: OutlinedButton.styleFrom(
                                 minimumSize: const Size.fromHeight(52),
                                 side: const BorderSide(
-                                  color: Color(0xffD1D5DB),
+                                  color: AppColors.gray300,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -222,7 +223,7 @@ class _HomeMorePageState extends State<HomeMorePage> {
                               },
                               style: ElevatedButton.styleFrom(
                                 minimumSize: const Size.fromHeight(52),
-                                backgroundColor: const Color(0xFF7AD8C4),
+                                backgroundColor: AppColors.brandMint,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -331,10 +332,10 @@ class _HomeMorePageState extends State<HomeMorePage> {
     final items = vm.meetingList?.items ?? [];
 
     return Scaffold(
-      backgroundColor: const Color(0xffffffff),
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xffffffff),
-        surfaceTintColor: const Color(0xffffffff),
+        backgroundColor: AppColors.white,
+        surfaceTintColor: AppColors.white,
         scrolledUnderElevation: 0,
         title: const Text(
           '모행',
@@ -367,21 +368,21 @@ class _HomeMorePageState extends State<HomeMorePage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(22),
                     borderSide: const BorderSide(
-                      color: Color(0xFF2DD4BF),
+                      color: AppColors.mint,
                       width: 1.5,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(22),
                     borderSide: const BorderSide(
-                      color: Color(0xFF7AD8C4),
+                      color: AppColors.brandMint,
                       width: 1.5,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(22),
                     borderSide: const BorderSide(
-                      color: Color(0xFF7AD8C4),
+                      color: AppColors.brandMint,
                       width: 1.5,
                     ),
                   ),
@@ -400,9 +401,9 @@ class _HomeMorePageState extends State<HomeMorePage> {
                     vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xffF8FAFC),
+                    color: AppColors.slate50,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xffE5E7EB)),
+                    border: Border.all(color: AppColors.gray200),
                   ),
                   child: Row(
                     children: [
@@ -426,7 +427,7 @@ class _HomeMorePageState extends State<HomeMorePage> {
                       const SizedBox(width: 8),
                       const Icon(
                         Icons.chevron_right_rounded,
-                        color: Color(0xff9CA3AF),
+                        color: AppColors.gray400,
                       ),
                     ],
                   ),
@@ -469,7 +470,7 @@ class _HomeMorePageState extends State<HomeMorePage> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xff8D8D8D),
+                                    color: AppColors.neutralGray,
                                   ),
                                 ),
                               ),
@@ -513,7 +514,7 @@ class _HomeMorePageState extends State<HomeMorePage> {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: LinearGradient(
-            colors: [Color(0xFF35C7B5), Color(0xFFD7E76C)],
+            colors: [AppColors.brandTeal, AppColors.brandLime],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

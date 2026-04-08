@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import '../viewmodels/user_profile_viewmodel.dart';
 import 'package:provider/provider.dart';
 import '../models/mypage_model.dart';
@@ -42,10 +43,10 @@ class _UserProfileViewState extends State<UserProfileView> {
     final categories = _categoryGroups(userProfile);
 
     return Scaffold(
-      backgroundColor: const Color(0xffffffff),
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xffffffff),
-        surfaceTintColor: const Color(0xffffffff),
+        backgroundColor: AppColors.white,
+        surfaceTintColor: AppColors.white,
         scrolledUnderElevation: 0,
         title: Text(userProfile.nickname),
       ),
@@ -134,12 +135,12 @@ class _UserProfile extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 38,
-          backgroundColor: const Color(0xffF3F4F6),
+          backgroundColor: AppColors.gray100,
           backgroundImage: profileImage.isNotEmpty
               ? NetworkImage(profileImage)
               : null,
           child: profileImage.isEmpty
-              ? const Icon(Icons.person, color: Color(0xff9CA3AF))
+              ? const Icon(Icons.person, color: AppColors.gray400)
               : null,
         ),
 
@@ -177,7 +178,7 @@ class _UserProfile extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xff999999),
+                    color: AppColors.mediumGray,
                   ),
                 ),
 
@@ -196,16 +197,16 @@ class _UserProfile extends StatelessWidget {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFF7ED),
+                            color: AppColors.orange50,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0xFFF5D0A9)),
+                            border: Border.all(color: AppColors.orange200),
                           ),
                           child: Text(
                             tag,
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF9A3412),
+                              color: AppColors.orange800,
                             ),
                           ),
                         ),
@@ -249,7 +250,7 @@ class _CountItem extends StatelessWidget {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF8D8D8D),
+            color: AppColors.neutralGray,
           ),
         ),
       ],

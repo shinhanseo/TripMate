@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 
 class GradientButton extends StatelessWidget {
   final String text;
@@ -23,7 +24,7 @@ class GradientButton extends StatelessWidget {
     this.borderRadius = 30,
     this.textStyle,
     this.elevation = 6,
-    this.shadowColor = const Color(0x33000000),
+    this.shadowColor = AppColors.shadowBlack,
   });
 
   @override

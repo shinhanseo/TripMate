@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/meeting_detail_viewmodel.dart';
 import '../../../core/widgets/custom_message_dialog.dart';
@@ -52,10 +53,10 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
     final bool isEnded = detail.scheduledAt.toLocal().isBefore(DateTime.now());
 
     return Scaffold(
-      backgroundColor: const Color(0xffffffff),
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xffffffff),
-        surfaceTintColor: const Color(0xffffffff),
+        backgroundColor: AppColors.white,
+        surfaceTintColor: AppColors.white,
         scrolledUnderElevation: 0,
         title: Row(
           children: [
@@ -133,7 +134,7 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xff9CA3AF),
+                  color: AppColors.gray400,
                 ),
               ),
 
@@ -150,14 +151,14 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
                       const Icon(
                         Icons.location_on_outlined,
                         size: 22,
-                        color: Color(0xff6B7280),
+                        color: AppColors.gray500,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         detail.placeText,
                         style: const TextStyle(
                           fontSize: 16,
-                          color: Color(0xff8D8D8D),
+                          color: AppColors.neutralGray,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -169,14 +170,14 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
                       const Icon(
                         Icons.access_time,
                         size: 22,
-                        color: Color(0xff6B7280),
+                        color: AppColors.gray500,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         _formatDateTime(detail.scheduledAt),
                         style: const TextStyle(
                           fontSize: 16,
-                          color: Color(0xff8D8D8D),
+                          color: AppColors.neutralGray,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -193,30 +194,30 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
                 children: [
                   _MeetingTag(
                     text: '${detail.currentMembers}/${detail.maxMembers}명',
-                    backgroundColor: const Color(0xffF1F5F9),
-                    textColor: const Color(0xff64748B),
+                    backgroundColor: AppColors.slate100,
+                    textColor: AppColors.slate500,
                   ),
                   _MeetingTag(
                     text: _genderLabel(detail.gender),
-                    backgroundColor: const Color(0xffECFDF5),
-                    textColor: const Color(0xff047857),
+                    backgroundColor: AppColors.success50,
+                    textColor: AppColors.success700,
                   ),
                   _MeetingTag(
                     text: _ageGroupLabel(detail.ageGroups),
-                    backgroundColor: const Color(0xffEEF2FF),
-                    textColor: const Color(0xff4338CA),
+                    backgroundColor: AppColors.indigo50,
+                    textColor: AppColors.indigo700,
                   ),
                   _MeetingTag(
                     text: _categoryLabel(detail.category),
-                    backgroundColor: const Color(0xffFFF7ED),
-                    textColor: const Color(0xffC2410C),
+                    backgroundColor: AppColors.orange50,
+                    textColor: AppColors.orange700,
                   ),
                 ],
               ),
 
               const SizedBox(height: 22),
 
-              const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
+              const Divider(color: AppColors.gray200, thickness: 1, height: 1),
 
               const SizedBox(height: 22),
 
@@ -237,13 +238,13 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   height: 1.6,
-                  color: Color(0xff4B5563),
+                  color: AppColors.gray600,
                 ),
               ),
 
               const SizedBox(height: 22),
 
-              const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
+              const Divider(color: AppColors.gray200, thickness: 1, height: 1),
 
               const SizedBox(height: 22),
 
@@ -291,7 +292,7 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
 
               const SizedBox(height: 20),
 
-              const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
+              const Divider(color: AppColors.gray200, thickness: 1, height: 1),
 
               const SizedBox(height: 20),
 
@@ -372,7 +373,7 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(18),
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF35C7B5), Color(0xFFD7E76C)],
+                      colors: [AppColors.brandTeal, AppColors.brandLime],
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
                     ),
@@ -605,9 +606,7 @@ class _UserProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isHost = role == 'host';
     String badgeText = isHost ? '방장' : '동행자';
-    final Color badgeColor = isHost
-        ? const Color(0xff7ED3C6)
-        : const Color(0xffD7DF6A);
+    final Color badgeColor = isHost ? AppColors.mintSoft : AppColors.limeSoft;
     final String genderStr = gender == 'M' ? '남성' : '여성';
     final String ageStr = '${ageRange[0]}0대';
 
@@ -621,7 +620,7 @@ class _UserProfile extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: const Color(0xffE5E7EB), width: 1.2),
+          border: Border.all(color: AppColors.gray200, width: 1.2),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.10),
@@ -636,12 +635,12 @@ class _UserProfile extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 28,
-              backgroundColor: const Color(0xffF3F4F6),
+              backgroundColor: AppColors.gray100,
               backgroundImage: profileImageUrl.isNotEmpty
                   ? NetworkImage(profileImageUrl)
                   : null,
               child: profileImageUrl.isEmpty
-                  ? const Icon(Icons.person, color: Color(0xff9CA3AF))
+                  ? const Icon(Icons.person, color: AppColors.gray400)
                   : null,
             ),
             const SizedBox(width: 12),
@@ -663,7 +662,7 @@ class _UserProfile extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xff6B7280),
+                    color: AppColors.gray500,
                   ),
                 ),
               ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 
 class ChatRoomCard extends StatelessWidget {
   const ChatRoomCard({
@@ -35,7 +36,7 @@ class ChatRoomCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xffE5E7EB), width: 1.2),
+            border: Border.all(color: AppColors.gray200, width: 1.2),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.10),
@@ -69,14 +70,14 @@ class ChatRoomCard extends StatelessWidget {
                       const Icon(
                         Icons.location_on_outlined,
                         size: 22,
-                        color: Color(0xff6B7280),
+                        color: AppColors.gray500,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         placeText,
                         style: const TextStyle(
                           fontSize: 16,
-                          color: Color(0xff8D8D8D),
+                          color: AppColors.neutralGray,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -88,14 +89,14 @@ class ChatRoomCard extends StatelessWidget {
                       const Icon(
                         Icons.access_time,
                         size: 22,
-                        color: Color(0xff6B7280),
+                        color: AppColors.gray500,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         _formatMeetingDateTime(scheduledAt),
                         style: const TextStyle(
                           fontSize: 16,
-                          color: Color(0xff8D8D8D),
+                          color: AppColors.neutralGray,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -111,7 +112,7 @@ class ChatRoomCard extends StatelessWidget {
                   vertical: 14,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xffF9FAFB),
+                  color: AppColors.gray50,
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Column(
@@ -124,8 +125,8 @@ class ChatRoomCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         color: hasLastMessage
-                            ? const Color(0xff6B7280)
-                            : const Color(0xff9CA3AF),
+                            ? AppColors.gray500
+                            : AppColors.gray400,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -137,7 +138,7 @@ class ChatRoomCard extends StatelessWidget {
                           _formatMessageTime(lastMessageCreatedAt!),
                           style: const TextStyle(
                             fontSize: 12,
-                            color: Color(0xff9CA3AF),
+                            color: AppColors.gray400,
                             fontWeight: FontWeight.w600,
                           ),
                         ),

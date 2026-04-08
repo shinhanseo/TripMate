@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/chat_detail_viewmodel.dart';
 
@@ -35,7 +36,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       return Scaffold(body: Center(child: Text(vm.errorMessage!)));
     }
 
-    return const Scaffold(backgroundColor: const Color(0xffffffff));
+    return const Scaffold(backgroundColor: AppColors.white);
   }
 
   static String _formatMeetingDateTime(DateTime dateTime) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../services/auth_api.dart';
@@ -57,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
+      backgroundColor: AppColors.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 36),
@@ -107,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
                           await viewModel.startNaverLogin();
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF7AC943),
+                    backgroundColor: AppColors.brandGreen,
                     foregroundColor: Colors.white,
                     elevation: 4,
                     shape: RoundedRectangleBorder(
@@ -137,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                               child: const Text(
                                 'N',
                                 style: TextStyle(
-                                  color: Color(0xFF7AC943),
+                                  color: AppColors.brandGreen,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
                                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../models/mypage_model.dart';
 import '../models/profile_edit_model.dart';
@@ -91,10 +92,10 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
 
     if (args == null) {
       return Scaffold(
-        backgroundColor: const Color(0xffffffff),
+        backgroundColor: AppColors.white,
         appBar: AppBar(
-          backgroundColor: const Color(0xffffffff),
-          surfaceTintColor: const Color(0xffffffff),
+          backgroundColor: AppColors.white,
+          surfaceTintColor: AppColors.white,
           scrolledUnderElevation: 0,
           title: const Text(
             '프로필 편집',
@@ -112,11 +113,11 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
     final myInfo = args as MyPageModel;
 
     return Scaffold(
-      backgroundColor: const Color(0xffffffff),
+      backgroundColor: AppColors.white,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        backgroundColor: const Color(0xffffffff),
-        surfaceTintColor: const Color(0xffffffff),
+        backgroundColor: AppColors.white,
+        surfaceTintColor: AppColors.white,
         scrolledUnderElevation: 0,
         title: const Text(
           '프로필 편집',
@@ -142,13 +143,13 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
                 alignment: Alignment.center,
                 child: CircleAvatar(
                   radius: 48,
-                  backgroundColor: const Color(0xffF3F4F6),
+                  backgroundColor: AppColors.gray100,
                   backgroundImage:
                       (_profileImageUrl != null && _profileImageUrl!.isNotEmpty)
                       ? NetworkImage(_profileImageUrl!)
                       : null,
                   child: (_profileImageUrl == null || _profileImageUrl!.isEmpty)
-                      ? const Icon(Icons.person, color: Color(0xff9CA3AF))
+                      ? const Icon(Icons.person, color: AppColors.gray400)
                       : null,
                 ),
               ),
@@ -163,7 +164,7 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(18),
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF35C7B5), Color(0xFFD7E76C)],
+                        colors: [AppColors.brandTeal, AppColors.brandLime],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                       ),
@@ -226,21 +227,21 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
                           borderSide: const BorderSide(
-                            color: Color(0xFF2DD4BF),
+                            color: AppColors.mint,
                             width: 1.5,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
                           borderSide: const BorderSide(
-                            color: Color(0xFF7AD8C4),
+                            color: AppColors.brandMint,
                             width: 1.5,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
                           borderSide: const BorderSide(
-                            color: Color(0xFF7AD8C4),
+                            color: AppColors.brandMint,
                             width: 1.5,
                           ),
                         ),
@@ -251,7 +252,7 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
               ),
 
               const SizedBox(height: 18),
-              const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
+              const Divider(color: AppColors.gray200, thickness: 1, height: 1),
               const SizedBox(height: 18),
 
               Row(
@@ -272,14 +273,14 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF999999),
+                      color: AppColors.mediumGray,
                     ),
                   ),
                 ],
               ),
 
               const SizedBox(height: 18),
-              const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
+              const Divider(color: AppColors.gray200, thickness: 1, height: 1),
               const SizedBox(height: 18),
 
               Row(
@@ -300,14 +301,14 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF999999),
+                      color: AppColors.mediumGray,
                     ),
                   ),
                 ],
               ),
 
               const SizedBox(height: 18),
-              const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
+              const Divider(color: AppColors.gray200, thickness: 1, height: 1),
               const SizedBox(height: 18),
 
               Row(
@@ -331,21 +332,21 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
                           borderSide: const BorderSide(
-                            color: Color(0xFF2DD4BF),
+                            color: AppColors.mint,
                             width: 1.5,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
                           borderSide: const BorderSide(
-                            color: Color(0xFF7AD8C4),
+                            color: AppColors.brandMint,
                             width: 1.5,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
                           borderSide: const BorderSide(
-                            color: Color(0xFF7AD8C4),
+                            color: AppColors.brandMint,
                             width: 1.5,
                           ),
                         ),
@@ -356,7 +357,7 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
               ),
 
               const SizedBox(height: 18),
-              const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
+              const Divider(color: AppColors.gray200, thickness: 1, height: 1),
               const SizedBox(height: 18),
 
               Row(
@@ -398,7 +399,7 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
             child: Ink(
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF35C7B5), Color(0xFFD7E76C)],
+                  colors: [AppColors.brandTeal, AppColors.brandLime],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),

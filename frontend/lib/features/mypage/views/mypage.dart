@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import 'package:frontend/core/widgets/bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../models/mypage_model.dart';
@@ -44,10 +45,10 @@ class _MyPageState extends State<MyPage> {
     final categories = _categoryGroups(me);
 
     return Scaffold(
-      backgroundColor: const Color(0xffffffff),
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xffffffff),
-        surfaceTintColor: const Color(0xffffffff),
+        backgroundColor: AppColors.white,
+        surfaceTintColor: AppColors.white,
         scrolledUnderElevation: 0,
         title: const Text('마이페이지'),
         automaticallyImplyLeading: false,
@@ -77,7 +78,7 @@ class _MyPageState extends State<MyPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(18),
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF35C7B5), Color(0xFFD7E76C)],
+                        colors: [AppColors.brandTeal, AppColors.brandLime],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                       ),
@@ -151,7 +152,7 @@ class _MyPageState extends State<MyPage> {
               ),
 
               const SizedBox(height: 8),
-              const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
+              const Divider(color: AppColors.gray200, thickness: 1, height: 1),
               const SizedBox(height: 8),
 
               _MyMeetingItem(
@@ -166,7 +167,7 @@ class _MyPageState extends State<MyPage> {
               ),
 
               const SizedBox(height: 8),
-              const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
+              const Divider(color: AppColors.gray200, thickness: 1, height: 1),
               const SizedBox(height: 8),
 
               _MyMeetingItem(
@@ -181,7 +182,7 @@ class _MyPageState extends State<MyPage> {
               ),
 
               const SizedBox(height: 8),
-              const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
+              const Divider(color: AppColors.gray200, thickness: 1, height: 1),
               const SizedBox(height: 8),
 
               _MyMeetingItem(
@@ -192,7 +193,7 @@ class _MyPageState extends State<MyPage> {
               ),
 
               const SizedBox(height: 8),
-              const Divider(color: Color(0xffE5E7EB), thickness: 1, height: 1),
+              const Divider(color: AppColors.gray200, thickness: 1, height: 1),
 
               const SizedBox(height: 42),
 
@@ -227,7 +228,7 @@ class _MyPageState extends State<MyPage> {
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                      border: Border.all(color: AppColors.gray200),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: const [
                         BoxShadow(
@@ -294,12 +295,12 @@ class _UserProfile extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 38,
-          backgroundColor: const Color(0xffF3F4F6),
+          backgroundColor: AppColors.gray100,
           backgroundImage: profileImage.isNotEmpty
               ? NetworkImage(profileImage)
               : null,
           child: profileImage.isEmpty
-              ? const Icon(Icons.person, color: Color(0xff9CA3AF))
+              ? const Icon(Icons.person, color: AppColors.gray400)
               : null,
         ),
 
@@ -337,7 +338,7 @@ class _UserProfile extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xff999999),
+                    color: AppColors.mediumGray,
                   ),
                 ),
 
@@ -356,16 +357,16 @@ class _UserProfile extends StatelessWidget {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFF7ED),
+                            color: AppColors.orange50,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0xFFF5D0A9)),
+                            border: Border.all(color: AppColors.orange200),
                           ),
                           child: Text(
                             tag,
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF9A3412),
+                              color: AppColors.orange800,
                             ),
                           ),
                         ),
@@ -409,7 +410,7 @@ class _CountItem extends StatelessWidget {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF8D8D8D),
+            color: AppColors.neutralGray,
           ),
         ),
       ],

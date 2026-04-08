@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/nickname_viewmodel.dart';
 
@@ -23,7 +24,7 @@ class _NicknamePageViewState extends State<NicknamePage> {
     final vm = context.watch<NicknameViewModel>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
+      backgroundColor: AppColors.white,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Padding(
@@ -73,7 +74,7 @@ class _NicknamePageViewState extends State<NicknamePage> {
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             height: 1.5,
-                            color: Color(0xFF999999),
+                            color: AppColors.mediumGray,
                           ),
                         ),
                       ),
@@ -87,21 +88,21 @@ class _NicknamePageViewState extends State<NicknamePage> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color(0xFF2DD4BF),
+                              color: AppColors.mint,
                               width: 1.5,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color(0xFF7AD8C4),
+                              color: AppColors.brandMint,
                               width: 1.5,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color(0xFF7AD8C4),
+                              color: AppColors.brandMint,
                               width: 2,
                             ),
                           ),
@@ -140,7 +141,7 @@ class _NicknamePageViewState extends State<NicknamePage> {
                   child: Ink(
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF35C7B5), Color(0xFFD7E76C)],
+                        colors: [AppColors.brandTeal, AppColors.brandLime],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                       ),

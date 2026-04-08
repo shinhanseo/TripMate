@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 
 class ConfirmDialog extends StatelessWidget {
   final String title;
@@ -53,7 +54,7 @@ class ConfirmDialog extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 15,
                 height: 1.5,
-                color: Color(0xff667085),
+                color: AppColors.blueGray,
               ),
             ),
             const SizedBox(height: 20),
@@ -66,7 +67,7 @@ class ConfirmDialog extends StatelessWidget {
                     },
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size.fromHeight(50),
-                      side: const BorderSide(color: Color(0xffD1D5DB)),
+                      side: const BorderSide(color: AppColors.gray300),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -87,7 +88,7 @@ class ConfirmDialog extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF35C7B5), Color(0xFFD7E76C)],
+                        colors: [AppColors.brandTeal, AppColors.brandLime],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                       ),

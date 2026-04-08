@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 
 class CustomMessageDialog extends StatelessWidget {
   final String title;
@@ -39,7 +40,7 @@ class CustomMessageDialog extends StatelessWidget {
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  colors: [Color(0xFF35C7B5), Color(0xFFD7E76C)],
+                  colors: [AppColors.brandTeal, AppColors.brandLime],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -66,7 +67,7 @@ class CustomMessageDialog extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 15,
                 height: 1.5,
-                color: Color(0xff667085),
+                color: AppColors.blueGray,
               ),
             ),
             const SizedBox(height: 20),
@@ -77,7 +78,7 @@ class CustomMessageDialog extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF35C7B5), Color(0xFFD7E76C)],
+                    colors: [AppColors.brandTeal, AppColors.brandLime],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),

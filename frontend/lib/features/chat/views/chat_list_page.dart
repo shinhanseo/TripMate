@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import 'package:frontend/core/widgets/bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/chat_list_viewmodel.dart';
@@ -56,10 +57,10 @@ class _ChatListPageState extends State<ChatListPage> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xffffffff),
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xffffffff),
-        surfaceTintColor: const Color(0xffffffff),
+        backgroundColor: AppColors.white,
+        surfaceTintColor: AppColors.white,
         title: const Text('채팅'),
       ),
       body: body,

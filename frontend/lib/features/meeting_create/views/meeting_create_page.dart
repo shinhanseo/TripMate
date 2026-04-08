@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/meeting_create_viewmodel.dart';
 import '../widgets/age_group_chip.dart';
@@ -193,11 +194,11 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
     final vm = context.watch<MeetingCreateViewModel>();
 
     return Scaffold(
-      backgroundColor: const Color(0xffffffff),
+      backgroundColor: AppColors.white,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        backgroundColor: const Color(0xffffffff),
-        surfaceTintColor: const Color(0xffffffff),
+        backgroundColor: AppColors.white,
+        surfaceTintColor: AppColors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: const Text(
@@ -232,21 +233,21 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
                           borderSide: const BorderSide(
-                            color: Color(0xFF2DD4BF),
+                            color: AppColors.mint,
                             width: 1.5,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
                           borderSide: const BorderSide(
-                            color: Color(0xFF7AD8C4),
+                            color: AppColors.brandMint,
                             width: 1.5,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
                           borderSide: const BorderSide(
-                            color: Color(0xFF7AD8C4),
+                            color: AppColors.brandMint,
                             width: 1.5,
                           ),
                         ),
@@ -290,7 +291,7 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(22),
                           border: Border.all(
-                            color: const Color(0xFF7AD8C4),
+                            color: AppColors.brandMint,
                             width: 1.5,
                           ),
                         ),
@@ -299,7 +300,7 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
                           style: TextStyle(
                             fontSize: 15,
                             color: _selectedPlaceName == null
-                                ? const Color(0xFF999999)
+                                ? AppColors.mediumGray
                                 : Colors.black,
                           ),
                         ),
@@ -329,8 +330,8 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
                       await _pickDate();
                     },
                     color: _selectedDate == null
-                        ? const Color(0xFFB3B3B3)
-                        : const Color(0xFF000000),
+                        ? AppColors.disabledGray
+                        : AppColors.black,
                   ),
                   const SizedBox(width: 14),
                   _timeButton(
@@ -344,8 +345,8 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
                       await _pickTime();
                     },
                     color: _selectedTime == null
-                        ? const Color(0xFFB3B3B3)
-                        : const Color(0xFF000000),
+                        ? AppColors.disabledGray
+                        : AppColors.black,
                   ),
                 ],
               ),
@@ -460,21 +461,21 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(22),
                     borderSide: const BorderSide(
-                      color: Color(0xFF2DD4BF),
+                      color: AppColors.mint,
                       width: 1.5,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(22),
                     borderSide: const BorderSide(
-                      color: Color(0xFF7AD8C4),
+                      color: AppColors.brandMint,
                       width: 1.5,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(22),
                     borderSide: const BorderSide(
-                      color: Color(0xFF7AD8C4),
+                      color: AppColors.brandMint,
                       width: 1.5,
                     ),
                   ),
@@ -505,7 +506,7 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
             child: Ink(
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF35C7B5), Color(0xFFD7E76C)],
+                  colors: [AppColors.brandTeal, AppColors.brandLime],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
@@ -544,7 +545,7 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
       height: 32,
       child: OutlinedButton.icon(
         onPressed: onTap,
-        icon: Icon(icon, size: 18, color: const Color(0xFF222222)),
+        icon: Icon(icon, size: 18, color: AppColors.dark),
         label: Text(
           text,
           style: TextStyle(
@@ -555,7 +556,7 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
         ),
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 22),
-          side: const BorderSide(color: Color(0xFF7AD8C4), width: 1.5),
+          side: const BorderSide(color: AppColors.brandMint, width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),
           ),
@@ -571,7 +572,7 @@ class _MeetingCreatePageState extends State<MeetingCreatePage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: const Color(0xFF7AD8C4), width: 1.5),
+        border: Border.all(color: AppColors.brandMint, width: 1.5),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 
 class WeatherMetaItem extends StatelessWidget {
   final String label;
@@ -14,7 +15,7 @@ class WeatherMetaItem extends StatelessWidget {
           label,
           style: const TextStyle(
             fontSize: 13,
-            color: Color(0xff9CA3AF),
+            color: AppColors.gray400,
             fontWeight: FontWeight.w500,
           ),
         ),

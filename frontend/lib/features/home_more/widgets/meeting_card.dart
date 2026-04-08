@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import '../models/meeting_model.dart';
 
 class MeetingCard extends StatelessWidget {
@@ -21,7 +22,7 @@ class MeetingCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xffE5E7EB), width: 1.2),
+            border: Border.all(color: AppColors.gray200, width: 1.2),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.10),
@@ -49,7 +50,7 @@ class MeetingCard extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xff9CA3AF),
+                  color: AppColors.gray400,
                 ),
               ),
               const SizedBox(height: 10),
@@ -64,14 +65,14 @@ class MeetingCard extends StatelessWidget {
                       const Icon(
                         Icons.location_on_outlined,
                         size: 22,
-                        color: Color(0xff6B7280),
+                        color: AppColors.gray500,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         meeting.placeText,
                         style: const TextStyle(
                           fontSize: 16,
-                          color: Color(0xff8D8D8D),
+                          color: AppColors.neutralGray,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -83,14 +84,14 @@ class MeetingCard extends StatelessWidget {
                       const Icon(
                         Icons.access_time,
                         size: 22,
-                        color: Color(0xff6B7280),
+                        color: AppColors.gray500,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         _formatDateTime(meeting.scheduledAt),
                         style: const TextStyle(
                           fontSize: 16,
-                          color: Color(0xff8D8D8D),
+                          color: AppColors.neutralGray,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -105,23 +106,23 @@ class MeetingCard extends StatelessWidget {
                 children: [
                   _MeetingTag(
                     text: '${meeting.currentMembers}/${meeting.maxMembers}명',
-                    backgroundColor: const Color(0xffF1F5F9),
-                    textColor: const Color(0xff64748B),
+                    backgroundColor: AppColors.slate100,
+                    textColor: AppColors.slate500,
                   ),
                   _MeetingTag(
                     text: _genderLabel(meeting.gender),
-                    backgroundColor: const Color(0xffECFDF5),
-                    textColor: const Color(0xff047857),
+                    backgroundColor: AppColors.success50,
+                    textColor: AppColors.success700,
                   ),
                   _MeetingTag(
                     text: _ageGroupLabel(meeting.ageGroups),
-                    backgroundColor: const Color(0xffEEF2FF),
-                    textColor: const Color(0xff4338CA),
+                    backgroundColor: AppColors.indigo50,
+                    textColor: AppColors.indigo700,
                   ),
                   _MeetingTag(
                     text: _categoryLabel(meeting.category),
-                    backgroundColor: const Color(0xffFFF7ED),
-                    textColor: const Color(0xffC2410C),
+                    backgroundColor: AppColors.orange50,
+                    textColor: AppColors.orange700,
                   ),
                 ],
               ),

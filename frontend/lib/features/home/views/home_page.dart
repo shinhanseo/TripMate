@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/core/widgets/bottom_nav_bar.dart';
 import 'package:frontend/core/widgets/gradient_button.dart';
@@ -36,10 +37,10 @@ class _HomePageState extends State<HomePage> {
     final summaries = summariesVm.regionSummaries;
 
     return Scaffold(
-      backgroundColor: const Color(0xffffffff),
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xffffffff),
-        surfaceTintColor: const Color(0xffffffff),
+        backgroundColor: AppColors.white,
+        surfaceTintColor: AppColors.white,
         scrolledUnderElevation: 0,
         title: const Text(
           '모행',
@@ -73,8 +74,8 @@ class _HomePageState extends State<HomePage> {
                   Expanded(
                     child: GradientButton(
                       text: "동행 모집하기",
-                      leftColor: const Color(0xff35C7B5),
-                      rightColor: const Color(0xffD7E76C),
+                      leftColor: AppColors.brandTeal,
+                      rightColor: AppColors.brandLime,
                       onTap: () {
                         Navigator.pushNamed(context, '/meetingcreate');
                       },
@@ -84,8 +85,8 @@ class _HomePageState extends State<HomePage> {
                   Expanded(
                     child: GradientButton(
                       text: "동행 참여하기",
-                      leftColor: const Color(0xff6ED0FF),
-                      rightColor: const Color(0xff4CC8D1),
+                      leftColor: AppColors.sky,
+                      rightColor: AppColors.cyan,
                       onTap: () {
                         Navigator.pushNamed(context, '/homemore');
                       },
@@ -118,7 +119,7 @@ class _HomePageState extends State<HomePage> {
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         height: 1.5,
-                        color: Color(0xff7ED6C2),
+                        color: AppColors.mintLight,
                       ),
                     ),
                   ),
@@ -147,7 +148,7 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: const Color(0xffE5E7EB),
+                            color: AppColors.gray200,
                             width: 1.2,
                           ),
                           boxShadow: [
@@ -211,9 +212,8 @@ class _HomePageState extends State<HomePage> {
                                                       const Icon(
                                                         Icons.cloud_outlined,
                                                         size: 36,
-                                                        color: Color(
-                                                          0xff7ED6C2,
-                                                        ),
+                                                        color:
+                                                            AppColors.mintLight,
                                                       ),
                                                 ),
                                                 const SizedBox(width: 8),
@@ -247,7 +247,7 @@ class _HomePageState extends State<HomePage> {
                                   const SizedBox(height: 6),
                                   const Divider(
                                     height: 1,
-                                    color: Color(0xffE5E7EB),
+                                    color: AppColors.gray200,
                                   ),
                                   const SizedBox(height: 10),
                                   Row(

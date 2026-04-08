@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/constants/app_colors.dart';
 import '../models/region_summary_model.dart';
 
 class JejuMapCard extends StatelessWidget {
@@ -33,7 +34,7 @@ class JejuMapCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xffE5E7EB), width: 1.2),
+        border: Border.all(color: AppColors.gray200, width: 1.2),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.12),
@@ -92,7 +93,7 @@ class _SummaryBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xffD9E1EC), width: 1.3),
+        border: Border.all(color: AppColors.borderBlueGray, width: 1.3),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.14),
