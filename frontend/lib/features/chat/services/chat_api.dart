@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../../auth/services/auth_api.dart';
 import '../../auth/services/token_storage.dart';
 import '../models/chat_list_model.dart';
+import '../models/chat_detail_model.dart';
 
 class ChatApi {
   final String baseUrl;
@@ -31,6 +32,20 @@ class ChatApi {
     }
 
     throw Exception(json['message'] ?? '채팅방 목록 조회에 실패했습니다.');
+  }
+
+  Future<ChatDetailModel> getChatDetail(int meetingId) async {
+    final url = Uri.parse('$baseUrl/api/chat/meetings/$meetingId/messages');
+
+    http.Response response = await _authorizedGet(url);
+
+    final Map<String, dynamic> json = jsonDecode(response.body);
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      final item = json['data']['item'] as Map<String, dynamic>;
+      return ChatDetailModel.fromJson(item);
+    }
+
+    throw Exception(json['message'] ?? '채팅방 조회에 실패했습니다.');
   }
 
   Future<http.Response> _authorizedGet(Uri url) async {
