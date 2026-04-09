@@ -16,6 +16,16 @@ export interface AuthRequest extends Request {
   user?: AuthUser;
 }
 
+export function verifyAccessToken(token: string): AuthUser {
+  const payload = jwt.verify(token, JWT_ACCESS_SECRET) as AuthUser;
+
+  if (payload.type !== "access") {
+    throw new Error("invalid token type");
+  }
+
+  return payload;
+}
+
 export function authRequired(
   req: AuthRequest,
   res: Response,
@@ -29,11 +39,7 @@ export function authRequired(
   }
 
   try {
-    const payload = jwt.verify(token, JWT_ACCESS_SECRET) as AuthUser;
-
-    if (payload.type !== "access") {
-      return fail(res, 401, "invalid token type");
-    }
+    const payload = verifyAccessToken(token);
 
     req.user = payload;
     next();
