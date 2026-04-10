@@ -1,5 +1,7 @@
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
+import '../models/chat_detail_model.dart';
+
 class ChatSocketService {
   final String socketBaseUrl;
 
@@ -10,7 +12,7 @@ class ChatSocketService {
   Future<void> connect({
     required String accessToken,
     required int meetingId,
-    required void Function(Map<String, dynamic> data) onNewMessage,
+    required void Function(MessageModel message) onNewMessage,
     required void Function(String message) onError,
   }) async {
     _socket?.dispose();
@@ -29,19 +31,21 @@ class ChatSocketService {
     });
 
     _socket!.on('new_message', (data) {
-      onNewMessage(Map<String, dynamic>.from(data as Map));
+      onNewMessage(_parseMessage(data));
     });
 
     _socket!.on('socket_error', (data) {
-      final map = Map<String, dynamic>.from(data as Map);
-      onError((map['message'] ?? 'socket error').toString());
+      onError(_parseErrorMessage(data));
     });
 
     _socket!.connect();
   }
 
   void sendMessage({required int meetingId, required String content}) {
-    _socket?.emit('send_message', {'meetingId': meetingId, 'content': content});
+    _socket?.emit('send_message', {
+      'meetingId': meetingId,
+      'content': content,
+    });
   }
 
   void dispose() {
@@ -50,5 +54,15 @@ class ChatSocketService {
     _socket?.disconnect();
     _socket?.dispose();
     _socket = null;
+  }
+
+  MessageModel _parseMessage(dynamic data) {
+    final map = Map<String, dynamic>.from(data as Map);
+    return MessageModel.fromJson(map);
+  }
+
+  String _parseErrorMessage(dynamic data) {
+    final map = Map<String, dynamic>.from(data as Map);
+    return (map['message'] ?? 'socket error').toString();
   }
 }
