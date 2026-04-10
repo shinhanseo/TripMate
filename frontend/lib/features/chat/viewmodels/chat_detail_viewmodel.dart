@@ -1,11 +1,17 @@
 import 'package:flutter/foundation.dart';
-import '../services/chat_api.dart';
+
 import '../models/chat_detail_model.dart';
+import '../services/chat_api.dart';
+import '../services/chat_socket_service.dart';
 
 class ChatDetailViewModel extends ChangeNotifier {
   final ChatApi chatApi;
+  final ChatSocketService chatSocketService;
 
-  ChatDetailViewModel({required this.chatApi});
+  ChatDetailViewModel({
+    required this.chatApi,
+    required this.chatSocketService,
+  });
 
   ChatDetailModel? chatDetail;
   bool isLoading = false;
@@ -25,6 +31,8 @@ class ChatDetailViewModel extends ChangeNotifier {
 
       chatDetail = result;
       hasLoaded = true;
+
+      await connectSocket(meetingId);
     } catch (e) {
       errorMessage = e.toString().replaceFirst('Exception: ', '');
       chatDetail = null;
@@ -32,5 +40,62 @@ class ChatDetailViewModel extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> connectSocket(int meetingId) async {
+    final accessToken = await chatApi.tokenStorage.getAccessToken();
+
+    if (accessToken == null || accessToken.isEmpty) {
+      throw Exception('로그인이 만료되었습니다.');
+    }
+
+    await chatSocketService.connect(
+      accessToken: accessToken,
+      meetingId: meetingId,
+      onNewMessage: _handleNewMessage,
+      onError: _handleSocketError,
+    );
+  }
+
+  void sendMessage({
+    required int meetingId,
+    required String content,
+  }) {
+    final trimmed = content.trim();
+
+    if (trimmed.isEmpty) return;
+
+    chatSocketService.sendMessage(
+      meetingId: meetingId,
+      content: trimmed,
+    );
+  }
+
+  void _handleNewMessage(MessageModel message) {
+    final current = chatDetail;
+
+    if (current == null) return;
+
+    chatDetail = ChatDetailModel(
+      roomId: current.roomId,
+      meeting: current.meeting,
+      messages: [
+        ...current.messages,
+        message,
+      ],
+    );
+
+    notifyListeners();
+  }
+
+  void _handleSocketError(String message) {
+    errorMessage = message;
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    chatSocketService.dispose();
+    super.dispose();
   }
 }
