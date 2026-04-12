@@ -70,6 +70,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.black),
+          onPressed: () {
+            Navigator.pop(context, true);
+          },
+        ),
         backgroundColor: AppColors.white,
         surfaceTintColor: AppColors.white,
         scrolledUnderElevation: 0,

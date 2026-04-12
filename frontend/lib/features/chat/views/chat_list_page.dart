@@ -49,11 +49,17 @@ class _ChatListPageState extends State<ChatListPage> {
             lastMessageContent: room.lastMessageContent,
             lastMessageCreatedAt: room.lastMessageCreatedAt,
             onTap: () async {
-              await Navigator.pushNamed(
+              final shouldRefresh = await Navigator.pushNamed(
                 context,
                 '/chatdetail',
                 arguments: room.meetingId,
               );
+
+              if (!mounted) return;
+
+              if (shouldRefresh == true) {
+                context.read<ChatListViewModel>().refreshChatRoomList();
+              }
             },
           );
         },
