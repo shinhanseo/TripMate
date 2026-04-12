@@ -8,10 +8,7 @@ class ChatDetailViewModel extends ChangeNotifier {
   final ChatApi chatApi;
   final ChatSocketService chatSocketService;
 
-  ChatDetailViewModel({
-    required this.chatApi,
-    required this.chatSocketService,
-  });
+  ChatDetailViewModel({required this.chatApi, required this.chatSocketService});
 
   ChatDetailModel? chatDetail;
   bool isLoading = false;
@@ -30,10 +27,11 @@ class ChatDetailViewModel extends ChangeNotifier {
       final result = await chatApi.getChatDetail(meetingId);
 
       chatDetail = result;
-      hasLoaded = true;
 
       await connectSocket(meetingId);
+      hasLoaded = true;
     } catch (e) {
+      hasLoaded = false;
       errorMessage = e.toString().replaceFirst('Exception: ', '');
       chatDetail = null;
     } finally {
@@ -57,18 +55,20 @@ class ChatDetailViewModel extends ChangeNotifier {
     );
   }
 
-  void sendMessage({
-    required int meetingId,
-    required String content,
-  }) {
+  void sendMessage({required int meetingId, required String content}) {
     final trimmed = content.trim();
 
     if (trimmed.isEmpty) return;
 
-    chatSocketService.sendMessage(
+    final didSend = chatSocketService.sendMessage(
       meetingId: meetingId,
       content: trimmed,
     );
+
+    if (!didSend) {
+      errorMessage = '채팅방 연결이 아직 완료되지 않았습니다.';
+      notifyListeners();
+    }
   }
 
   void _handleNewMessage(MessageModel message) {
@@ -79,10 +79,7 @@ class ChatDetailViewModel extends ChangeNotifier {
     chatDetail = ChatDetailModel(
       roomId: current.roomId,
       meeting: current.meeting,
-      messages: [
-        ...current.messages,
-        message,
-      ],
+      messages: [...current.messages, message],
     );
 
     notifyListeners();

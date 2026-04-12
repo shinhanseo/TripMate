@@ -17,6 +17,8 @@ class ChatDetailPage extends StatefulWidget {
 
 class _ChatDetailPageState extends State<ChatDetailPage> {
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  int _lastMessageCount = 0;
 
   @override
   void initState() {
@@ -30,6 +32,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   @override
   void dispose() {
     _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -54,6 +57,15 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
     final meeting = detail.meeting;
     final messages = detail.messages;
+    final messageCount = messages.length;
+
+    if (messageCount != _lastMessageCount) {
+      final shouldAnimate = _lastMessageCount > 0;
+      _lastMessageCount = messageCount;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottom(animated: shouldAnimate);
+      });
+    }
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -135,6 +147,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     ),
                   )
                 : ListView.builder(
+                    controller: _scrollController,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 16,
@@ -228,5 +241,22 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     final local = dateTime.toLocal();
 
     return '${local.month}/${local.day} ${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
+  }
+
+  void _scrollToBottom({required bool animated}) {
+    if (!_scrollController.hasClients) return;
+
+    final position = _scrollController.position.maxScrollExtent;
+
+    if (animated) {
+      _scrollController.animateTo(
+        position,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
+      return;
+    }
+
+    _scrollController.jumpTo(position);
   }
 }

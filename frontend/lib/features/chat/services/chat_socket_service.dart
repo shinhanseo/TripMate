@@ -1,12 +1,17 @@
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'dart:async';
+
+import 'package:socket_io_client/socket_io_client.dart' as io;
 import '../models/chat_detail_model.dart';
 
 class ChatSocketService {
   final String socketBaseUrl;
 
-  IO.Socket? _socket;
+  io.Socket? _socket;
+  bool _isJoined = false;
 
   ChatSocketService({required this.socketBaseUrl});
+
+  bool get isReady => _socket?.connected == true && _isJoined;
 
   Future<void> connect({
     required String accessToken,
@@ -14,11 +19,15 @@ class ChatSocketService {
     required void Function(MessageModel message) onNewMessage,
     required void Function(String message) onError,
   }) async {
-    _socket?.dispose();
+    final joinCompleter = Completer<void>();
 
-    _socket = IO.io(
+    _socket?.disconnect();
+    _socket?.dispose();
+    _isJoined = false;
+
+    _socket = io.io(
       socketBaseUrl,
-      IO.OptionBuilder()
+      io.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
           .setAuth({'token': accessToken})
@@ -27,6 +36,13 @@ class ChatSocketService {
 
     _socket!.onConnect((_) {
       _socket!.emit('join_room', {'meetingId': meetingId});
+    });
+
+    _socket!.on('joined_room', (_) {
+      _isJoined = true;
+      if (!joinCompleter.isCompleted) {
+        joinCompleter.complete();
+      }
     });
 
     _socket!.on('new_message', (data) {
@@ -38,11 +54,19 @@ class ChatSocketService {
     });
 
     _socket!.on('socket_error', (data) {
-      onError(_parseErrorMessage(data));
+      final message = _parseErrorMessage(data);
+      if (!_isJoined && !joinCompleter.isCompleted) {
+        joinCompleter.completeError(Exception(message));
+      }
+      onError(message);
     });
 
     _socket!.onConnectError((data) {
-      onError('채팅 서버 연결에 실패했습니다.');
+      const message = '채팅 서버 연결에 실패했습니다.';
+      if (!joinCompleter.isCompleted) {
+        joinCompleter.completeError(Exception(message));
+      }
+      onError(message);
     });
 
     _socket!.onError((data) {
@@ -52,13 +76,21 @@ class ChatSocketService {
     _socket!.onDisconnect((data) {});
 
     _socket!.connect();
+    await joinCompleter.future;
   }
 
-  void sendMessage({required int meetingId, required String content}) {
+  bool sendMessage({required int meetingId, required String content}) {
+    if (!isReady) {
+      return false;
+    }
+
     _socket?.emit('send_message', {'meetingId': meetingId, 'content': content});
+    return true;
   }
 
   void dispose() {
+    _isJoined = false;
+    _socket?.off('joined_room');
     _socket?.off('new_message');
     _socket?.off('socket_error');
     _socket?.off('connect_error');
