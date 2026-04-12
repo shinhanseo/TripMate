@@ -101,7 +101,7 @@ export function setupChatSocket(server: http.Server) {
         }
 
         const roomName = getRoomName(meetingId);
-        socket.join(roomName);
+        await socket.join(roomName);
 
         socket.emit("joined_room", {
           meetingId,
