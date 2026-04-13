@@ -49,55 +49,60 @@ class ChatMessageBubble extends StatelessWidget {
           )
         : const SizedBox(width: 36);
 
+    final myChat = Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [timeText, const SizedBox(width: 8), bubble],
+    );
+
+    final otherChatProfile = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 44, bottom: 4),
+          child: Text(
+            message.senderNickname ?? '',
+            style: const TextStyle(
+              fontSize: 14,
+              color: AppColors.black,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            profile,
+            const SizedBox(width: 8),
+            bubble,
+            const SizedBox(width: 8),
+            timeText,
+          ],
+        ),
+      ],
+    );
+    final otherChatDefault = Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        const SizedBox(width: 36),
+        const SizedBox(width: 8),
+        bubble,
+        const SizedBox(width: 8),
+        timeText,
+      ],
+    );
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Align(
         alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
         child: isMine
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [timeText, const SizedBox(width: 8), bubble],
-              )
+            ? myChat
             : showProfileImageAndNickname
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 44, bottom: 4),
-                    child: Text(
-                      message.senderNickname ?? '',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.black,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      profile,
-                      const SizedBox(width: 8),
-                      bubble,
-                      const SizedBox(width: 8),
-                      timeText,
-                    ],
-                  ),
-                ],
-              )
-            : Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const SizedBox(width: 36),
-                  const SizedBox(width: 8),
-                  bubble,
-                  const SizedBox(width: 8),
-                  timeText,
-                ],
-              ),
+            ? otherChatProfile
+            : otherChatDefault,
       ),
     );
   }
