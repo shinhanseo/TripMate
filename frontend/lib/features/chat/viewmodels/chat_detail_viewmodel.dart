@@ -41,9 +41,9 @@ class ChatDetailViewModel extends ChangeNotifier {
   }
 
   Future<void> connectSocket(int meetingId) async {
-    final accessToken = await chatApi.tokenStorage.getAccessToken();
+    final accessToken = await chatApi.getValidAccessToken();
 
-    if (accessToken == null || accessToken.isEmpty) {
+    if (accessToken.isEmpty) {
       throw Exception('로그인이 만료되었습니다.');
     }
 
