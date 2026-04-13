@@ -24,6 +24,8 @@ class ChatRoomCard extends StatelessWidget {
     final hasLastMessage =
         lastMessageContent != null && lastMessageContent!.trim().isNotEmpty;
 
+    final isPastMeeting = DateTime.now().isAfter(scheduledAt.toLocal());
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -48,16 +50,44 @@ class ChatRoomCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black,
-                ),
+              Row(
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isPastMeeting
+                          ? AppColors.brandTeal
+                          : AppColors.brandGreen,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      isPastMeeting ? '동행 종료' : '동행 예정',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
               ),
+
               const SizedBox(height: 10),
               Wrap(
                 spacing: 14,
