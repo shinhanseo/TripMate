@@ -455,6 +455,14 @@ class _MeetingDetailPageState extends State<MeetingDetailPage> {
                           await context
                               .read<MeetingDetailViewModel>()
                               .joinMeeting(detail.id);
+
+                          if (!mounted) return;
+
+                          await Navigator.pushNamed(
+                            context,
+                            '/chatdetail',
+                            arguments: widget.meetingId,
+                          );
                         }
                       } catch (e) {
                         if (!context.mounted) return;
