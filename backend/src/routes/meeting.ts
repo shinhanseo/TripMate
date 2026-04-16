@@ -432,9 +432,10 @@ router.post("/", authRequired, async (req: AuthRequest, res: Response) => {
       insert into chat_room_members (
         room_id,
         user_id,
-        joined_at
+        joined_at,
+        join_notice_sent
       )
-      values ($1, $2, now())
+      values ($1, $2, now(), FALSE)
       `,
       [roomId, userId]
     );
