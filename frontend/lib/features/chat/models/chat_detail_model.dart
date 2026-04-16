@@ -58,6 +58,7 @@ class MeetingModel {
 class MessageModel {
   final int id;
   final int roomId;
+  final String type;
   final int senderId;
   final String? senderNickname;
   final String? senderProfileImageUrl;
@@ -68,6 +69,7 @@ class MessageModel {
   MessageModel({
     required this.id,
     required this.roomId,
+    required this.type,
     required this.senderId,
     required this.senderNickname,
     required this.senderProfileImageUrl,
@@ -80,6 +82,7 @@ class MessageModel {
     return MessageModel(
       id: int.parse(json['id'].toString()),
       roomId: int.parse(json['roomId'].toString()),
+      type: json['type'] as String,
       senderId: int.parse(json['senderId'].toString()),
       senderNickname: json['senderNickname'] as String?,
       senderProfileImageUrl: json['senderProfileImageUrl'] as String?,
