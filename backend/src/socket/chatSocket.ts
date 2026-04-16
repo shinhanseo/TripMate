@@ -20,7 +20,8 @@ type NewMessagePayload = {
   id: number;
   roomId: number;
   meetingId: number;
-  senderId: number;
+  type: "text" | "system",
+  senderId: number | null;
   senderNickname: string | null;
   senderProfileImageUrl: string | null;
   content: string;
@@ -72,6 +73,7 @@ export function setupChatSocket(server: http.Server) {
       const meetingId = Number(payload?.meetingId);
 
       console.log("join_room", { userId, meetingId });
+
       if (!Number.isInteger(meetingId) || meetingId <= 0) {
         socket.emit("socket_error", {
           message: "invalid meeting id",
@@ -82,34 +84,111 @@ export function setupChatSocket(server: http.Server) {
       const client = await pool.connect();
 
       try {
+        await client.query("begin");
+
         const memberRes = await client.query(
           `
-          select cr.id as room_id
+          select
+            cr.id as room_id,
+            crm.id as chat_room_member_id,
+            crm.join_notice_sent,
+            up.nickname
           from chat_rooms cr
           join chat_room_members crm
             on crm.room_id = cr.id
            and crm.user_id = $2
+          left join user_profiles up
+            on up.user_id = crm.user_id
           where cr.meeting_id = $1
+          for update of crm
           `,
           [meetingId, userId]
         );
 
         if (memberRes.rowCount === 0) {
+          await client.query("rollback");
           socket.emit("socket_error", {
             message: "forbidden",
           } satisfies SocketErrorPayload);
           return;
         }
 
+        const member = memberRes.rows[0];
+        const roomId = Number(member.room_id);
+        const chatRoomMemberId = member.chat_room_member_id;
+        const joinNoticeSent = Boolean(member.join_notice_sent);
+        const nickname = member.nickname ?? "새로운 동행자";
+
+        let systemMessage: NewMessagePayload | null = null;
+
+        if (!joinNoticeSent) {
+          const insertMessageRes = await client.query(
+            `
+            insert into chat_messages (
+              room_id,
+              sender_id,
+              content,
+              message_type
+            )
+            values ($1, null, $2, 'system')
+            returning
+              id,
+              room_id,
+              sender_id,
+              content,
+              message_type,
+              created_at,
+              updated_at
+            `,
+            [roomId, `${nickname}님이 동행에 참가했어요`]
+          );
+
+          await client.query(
+            `
+            update chat_room_members
+            set join_notice_sent = true
+            where id = $1
+            `,
+            [chatRoomMemberId]
+          );
+
+          const message = insertMessageRes.rows[0];
+
+          systemMessage = {
+            id: Number(message.id),
+            roomId: Number(message.room_id),
+            meetingId,
+            type: message.message_type,
+            senderId: message.sender_id === null ? null : Number(message.sender_id),
+            senderNickname: null,
+            senderProfileImageUrl: null,
+            content: message.content,
+            createdAt: new Date(message.created_at).toISOString(),
+            updatedAt: new Date(message.updated_at).toISOString(),
+          };
+        }
+
+        await client.query("commit");
+
         const roomName = getRoomName(meetingId);
+
         await socket.join(roomName);
+
         console.log("joined_room_done", { userId, roomName });
+
         socket.emit("joined_room", {
           meetingId,
           roomName,
         });
 
+        if (systemMessage) {
+          io.to(roomName).emit("new_message", systemMessage);
+        }
       } catch (error) {
+        await client.query("rollback");
+
+        console.error("join_room error:", error);
+
         socket.emit("socket_error", {
           message: "failed to join room",
         } satisfies SocketErrorPayload);
@@ -117,6 +196,7 @@ export function setupChatSocket(server: http.Server) {
         client.release();
       }
     });
+
 
     socket.on("send_message", async (payload: SendMessagePayload) => {
       const meetingId = Number(payload?.meetingId);
@@ -217,6 +297,7 @@ export function setupChatSocket(server: http.Server) {
           id: Number(message.id),
           roomId: Number(message.room_id),
           meetingId,
+          type: "text",
           senderId: Number(message.sender_id),
           senderNickname: senderRes.rows[0]?.nickname ?? null,
           senderProfileImageUrl:
