@@ -54,12 +54,10 @@ class AgeGroupChip extends StatelessWidget {
               final updated = List<String>.from(selectedAgeGroups);
 
               if (value == 'any') {
-                // 연령 무관 선택 시 나머지 전부 해제
                 onChanged(['any']);
                 return;
               }
 
-              // 다른 연령 선택 시 'any' 제거
               updated.remove('any');
 
               if (isSelected) {
@@ -68,7 +66,16 @@ class AgeGroupChip extends StatelessWidget {
                 updated.add(value);
               }
 
-              // 아무것도 없으면 다시 'any'로 복귀시키고 싶을 때
+              if ([
+                '20s',
+                '30s',
+                '40s',
+                '50s',
+              ].every((e) => updated.contains(e))) {
+                onChanged(['any']);
+                return;
+              }
+
               if (updated.isEmpty) {
                 updated.add('any');
               }
