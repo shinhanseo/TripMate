@@ -435,7 +435,7 @@ router.post("/", authRequired, async (req: AuthRequest, res: Response) => {
         joined_at,
         join_notice_sent
       )
-      values ($1, $2, now(), FALSE)
+      values ($1, $2, now(), true)
       `,
       [roomId, userId]
     );
