@@ -325,6 +325,18 @@ router.get("/rooms", authRequired, async (req: AuthRequest, res: Response) => {
         lm.content as last_message_content,
         lm.created_at as last_message_created_at,
         up.nickname as last_message_sender_nickname
+        (
+          select count(*)
+          from chat_messages unread_cm
+          where unread_cm.room_id = cr.id
+            and unread_cm.created_at >= crm.joined_at
+            and unread_cm.sender_id is not null
+            and unread_cm.sender_id <> $1
+            and (
+              crm.last_read_message_id is null
+              or unread_cm.id > crm.last_read_message_id
+            )
+        ) as unread_count
       from chat_room_members crm
       join chat_rooms cr
         on cr.id = crm.room_id
@@ -374,6 +386,7 @@ router.get("/rooms", authRequired, async (req: AuthRequest, res: Response) => {
         lastMessageSenderNickname: row.last_message_sender_nickname,
         lastMessageContent: row.last_message_content,
         lastMessageCreatedAt: row.last_message_created_at,
+        unreadCount: Number(row.unread_count),
       })),
     });
   } catch (error: any) {
