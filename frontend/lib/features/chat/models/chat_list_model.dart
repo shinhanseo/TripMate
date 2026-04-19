@@ -13,6 +13,7 @@ class ChatListModel {
   final String? lastMessageSenderNickname;
   final String? lastMessageContent;
   final DateTime? lastMessageCreatedAt;
+  final int unreadCount;
 
   ChatListModel({
     required this.roomId,
@@ -29,6 +30,7 @@ class ChatListModel {
     this.lastMessageSenderNickname,
     this.lastMessageContent,
     this.lastMessageCreatedAt,
+    required this.unreadCount,
   });
 
   factory ChatListModel.fromJson(Map<String, dynamic> json) {
@@ -53,6 +55,7 @@ class ChatListModel {
       lastMessageCreatedAt: json['lastMessageCreatedAt'] == null
           ? null
           : DateTime.parse(json['lastMessageCreatedAt'] as String),
+      unreadCount: int.parse((json['unreadCount'] ?? 0).toString()),
     );
   }
 }
