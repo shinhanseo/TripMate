@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/constants/app_colors.dart';
+import 'package:frontend/features/meeting_shared/utils/meeting_filter_options.dart';
+import 'package:frontend/features/meeting_shared/utils/meeting_filter_selection.dart';
+import 'package:frontend/features/meeting_shared/widgets/meeting_filter_bottom_sheet.dart';
 import '../viewmodels/my_meeting_viewmodel.dart';
 import 'package:provider/provider.dart';
 
-import '../../home_more/widgets/age_group_chip.dart';
-import '../../home_more/widgets/category_chip.dart';
-import '../../home_more/widgets/gender_chip.dart';
-import '../../home_more/widgets/region_chip.dart';
 import '../../home_more/widgets/meeting_card.dart';
 
 class MyMeetingListPage extends StatefulWidget {
@@ -51,280 +50,25 @@ class _MyMeetingListPageState extends State<MyMeetingListPage> {
   Future<void> _openFilterModal() async {
     final vm = context.read<MyMeetingViewModel>();
 
-    String? tempCategory = vm.selectedCategory;
-    String? tempGender = vm.selectedGender;
-    String? tempAgeGroup = vm.selectedAgeGroup;
-    String? tempRegion = vm.selectedRegionPrimary;
-
-    await showModalBottomSheet(
+    final selection = await showMeetingFilterBottomSheet(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      initialSelection: MeetingFilterSelection(
+        category: vm.selectedCategory,
+        gender: vm.selectedGender,
+        ageGroup: vm.selectedAgeGroup,
+        regionPrimary: vm.selectedRegionPrimary,
       ),
-      builder: (modalContext) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 16,
-                right: 16,
-                top: 16,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-              ),
-              child: SafeArea(
-                top: false,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Container(
-                          width: 42,
-                          height: 5,
-                          decoration: BoxDecoration(
-                            color: AppColors.gray300,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      const Text(
-                        '필터',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-                      const Text(
-                        '카테고리',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                        ),
-                      ),
-
-                      CategoryChip(
-                        selectedCategory: tempCategory,
-                        onChanged: (value) {
-                          setModalState(() {
-                            tempCategory = value;
-                          });
-                        },
-                      ),
-
-                      const SizedBox(height: 8),
-                      const Text(
-                        '연령',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                        ),
-                      ),
-                      AgeGroupChip(
-                        selectedAgeGroup: tempAgeGroup,
-                        onChanged: (value) {
-                          setModalState(() {
-                            tempAgeGroup = value;
-                          });
-                        },
-                      ),
-
-                      const SizedBox(height: 8),
-                      const Text(
-                        '성별',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                        ),
-                      ),
-                      GenderChip(
-                        selectedGender: tempGender,
-                        onChanged: (value) {
-                          setModalState(() {
-                            tempGender = value;
-                          });
-                        },
-                      ),
-
-                      const SizedBox(height: 8),
-                      const Text(
-                        '지역',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                        ),
-                      ),
-                      RegionChip(
-                        selectedRegion: tempRegion,
-                        onChanged: (value) {
-                          setModalState(() {
-                            tempRegion = value;
-                          });
-                        },
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () {
-                                setModalState(() {
-                                  tempCategory = null;
-                                  tempGender = null;
-                                  tempAgeGroup = null;
-                                  tempRegion = null;
-                                });
-                              },
-                              style: OutlinedButton.styleFrom(
-                                minimumSize: const Size.fromHeight(52),
-                                side: const BorderSide(
-                                  color: AppColors.gray300,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              child: const Text(
-                                '초기화',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                Navigator.pop(modalContext);
-
-                                await vm.applyFilters(
-                                  category: tempCategory,
-                                  gender: tempGender,
-                                  ageGroup: tempAgeGroup,
-                                  regionPrimary: tempRegion,
-                                  query: _searchController.text.trim(),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: const Size.fromHeight(52),
-                                backgroundColor: AppColors.brandMint,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              child: const Text(
-                                '적용',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
     );
-  }
 
-  String _categoryLabel(String value) {
-    switch (value) {
-      case 'cafe':
-        return '☕ 카페';
-      case 'food':
-        return '🍜 식사';
-      case 'activity':
-        return '🏄 액티비티';
-      case 'drink':
-        return '🍺 술';
-      case 'tour':
-        return '🚗 관광';
-      default:
-        return value;
-    }
-  }
+    if (!mounted || selection == null) return;
 
-  String _ageGroupLabel(String value) {
-    switch (value) {
-      case 'any':
-        return '연령 무관';
-      case '20s':
-        return '20대';
-      case '30s':
-        return '30대';
-      case '40s':
-        return '40대';
-      case '50s':
-        return '50대';
-      default:
-        return value;
-    }
-  }
-
-  String _genderLabel(String value) {
-    switch (value) {
-      case 'any':
-        return '성별 무관';
-      case 'male':
-        return '남성';
-      case 'female':
-        return '여성';
-      default:
-        return value;
-    }
-  }
-
-  String _filterSummary(MyMeetingViewModel vm) {
-    final List<String> values = [];
-
-    if (vm.selectedCategory != null && vm.selectedCategory!.isNotEmpty) {
-      values.add(_categoryLabel(vm.selectedCategory!));
-    }
-
-    if (vm.selectedAgeGroup != null && vm.selectedAgeGroup!.isNotEmpty) {
-      values.add(_ageGroupLabel(vm.selectedAgeGroup!));
-    }
-
-    if (vm.selectedGender != null && vm.selectedGender!.isNotEmpty) {
-      values.add(_genderLabel(vm.selectedGender!));
-    }
-
-    if (vm.selectedRegionPrimary != null &&
-        vm.selectedRegionPrimary!.isNotEmpty) {
-      values.add(vm.selectedRegionPrimary!);
-    }
-
-    if (values.isEmpty) {
-      return '전체 필터';
-    }
-
-    return values.join(' · ');
+    await vm.applyFilters(
+      category: selection.category,
+      gender: selection.gender,
+      ageGroup: selection.ageGroup,
+      regionPrimary: selection.regionPrimary,
+      query: _searchController.text.trim(),
+    );
   }
 
   String get _title {
@@ -427,7 +171,12 @@ class _MyMeetingListPageState extends State<MyMeetingListPage> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          _filterSummary(vm),
+                          meetingFilterSummary(
+                            category: vm.selectedCategory,
+                            ageGroup: vm.selectedAgeGroup,
+                            gender: vm.selectedGender,
+                            regionPrimary: vm.selectedRegionPrimary,
+                          ),
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,

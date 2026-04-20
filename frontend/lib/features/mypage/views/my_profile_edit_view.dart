@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/features/meeting_shared/widgets/meeting_filter_chips.dart';
 import '../models/mypage_model.dart';
 import '../models/profile_edit_model.dart';
 import '../viewmodels/profile_edit_viewmodel.dart';
-import '../widgets/category_chip.dart';
 import '../../../core/widgets/custom_message_dialog.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -52,6 +52,7 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
 
   Future<void> _pickAndUploadImage() async {
     final picker = ImagePicker();
+    final viewModel = context.read<ProfileEditViewModel>();
 
     final pickedFile = await picker.pickImage(
       source: ImageSource.gallery,
@@ -61,9 +62,7 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
     if (pickedFile == null) return;
 
     try {
-      final imageUrl = await context
-          .read<ProfileEditViewModel>()
-          .uploadProfileImage(pickedFile.path);
+      final imageUrl = await viewModel.uploadProfileImage(pickedFile.path);
 
       if (!mounted) return;
 
@@ -80,8 +79,6 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
           message: e.toString().replaceFirst('Exception: ', ''),
         ),
       );
-    } finally {
-      if (!mounted) return;
     }
   }
 
@@ -374,8 +371,8 @@ class _MyProfileEditPageState extends State<MyProfileEditPage> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: CategoryChip(
-                      selectedCategory: selectedCategories,
+                    child: MeetingCategoryMultiChip(
+                      selectedCategories: selectedCategories,
                       onChanged: (values) {
                         setState(() {
                           selectedCategories = values;

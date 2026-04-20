@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/constants/app_colors.dart';
+import 'package:frontend/features/meeting_shared/widgets/meeting_filter_chips.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/meeting_update_viewmodel.dart';
-import '../widgets/age_group_chip.dart';
-import '../widgets/gender_chip.dart';
-import '../widgets/category_chip.dart';
+import '../utils/meeting_form_formatters.dart';
 import '../models/place_search_model.dart';
 import '../models/meeting_update_model.dart';
+import '../widgets/meeting_form_controls.dart';
 import '../../home_more/models/meeting_model.dart';
 import '../../../core/widgets/custom_message_dialog.dart';
 
@@ -368,11 +368,9 @@ class _MeetingUpdatePageState extends State<MeetingUpdatePage> {
 
                   const SizedBox(width: 16),
 
-                  _timeButton(
+                  MeetingTimeButton(
                     icon: Icons.calendar_month_outlined,
-                    text: _selectedDate == null
-                        ? '날짜'
-                        : '${_selectedDate!.month}.${_selectedDate!.day}',
+                    text: meetingDateButtonLabel(_selectedDate),
                     onTap: () async {
                       await _pickDate();
                     },
@@ -381,13 +379,9 @@ class _MeetingUpdatePageState extends State<MeetingUpdatePage> {
                         : AppColors.black,
                   ),
                   const SizedBox(width: 14),
-                  _timeButton(
+                  MeetingTimeButton(
                     icon: Icons.access_time,
-                    text: _selectedTime == null
-                        ? '시간'
-                        : _selectedTime!.minute > 10
-                        ? '${_selectedTime!.hour}:${_selectedTime!.minute}'
-                        : '${_selectedTime!.hour}:0${_selectedTime!.minute}',
+                    text: meetingTimeButtonLabel(_selectedTime),
                     onTap: () async {
                       await _pickTime();
                     },
@@ -414,7 +408,14 @@ class _MeetingUpdatePageState extends State<MeetingUpdatePage> {
                       ),
 
                       const SizedBox(height: 8),
-                      _buildCountSelector(),
+                      MemberCountSelector(
+                        count: _memberCount,
+                        onChanged: (value) {
+                          setState(() {
+                            _memberCount = value;
+                          });
+                        },
+                      ),
                     ],
                   ),
 
@@ -432,8 +433,9 @@ class _MeetingUpdatePageState extends State<MeetingUpdatePage> {
                         ),
                       ),
 
-                      GenderChip(
+                      MeetingGenderChip(
                         selectedGender: selectedGender,
+                        allowDeselection: false,
                         onChanged: (values) {
                           if (values != 'any' && vm.gender != values) {
                             showDialog(
@@ -464,7 +466,7 @@ class _MeetingUpdatePageState extends State<MeetingUpdatePage> {
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
 
-              AgeGroupChip(
+              MeetingAgeGroupMultiChip(
                 selectedAgeGroups: selectedAgeGroups,
                 onChanged: (values) {
                   setState(() {
@@ -480,8 +482,9 @@ class _MeetingUpdatePageState extends State<MeetingUpdatePage> {
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
 
-              CategoryChip(
+              MeetingCategoryChip(
                 selectedCategory: selectedCategory,
+                allowDeselection: false,
                 onChanged: (values) {
                   setState(() {
                     selectedCategory = values;
@@ -578,81 +581,6 @@ class _MeetingUpdatePageState extends State<MeetingUpdatePage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _timeButton({
-    required IconData icon,
-    required String text,
-    required VoidCallback onTap,
-    required Color color,
-  }) {
-    return SizedBox(
-      height: 32,
-      child: OutlinedButton.icon(
-        onPressed: onTap,
-        icon: Icon(icon, size: 18, color: AppColors.dark),
-        label: Text(
-          text,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: color,
-          ),
-        ),
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 22),
-          side: const BorderSide(color: AppColors.brandMint, width: 1.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-          ),
-          backgroundColor: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCountSelector() {
-    return Container(
-      height: 38,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: AppColors.brandMint, width: 1.5),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          IconButton(
-            onPressed: () {
-              if (_memberCount > 1) {
-                setState(() {
-                  _memberCount--;
-                });
-              }
-            },
-            icon: const Icon(Icons.remove, size: 22, color: Colors.black87),
-          ),
-
-          Text(
-            '$_memberCount명',
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: Colors.black,
-            ),
-          ),
-
-          IconButton(
-            onPressed: () {
-              setState(() {
-                _memberCount++;
-              });
-            },
-            icon: const Icon(Icons.add, size: 22, color: Colors.black87),
-          ),
-        ],
       ),
     );
   }

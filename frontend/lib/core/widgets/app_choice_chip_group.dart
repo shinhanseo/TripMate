@@ -1,33 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/constants/app_colors.dart';
+import 'package:frontend/core/models/chip_option.dart';
 
-class CategoryChip extends StatelessWidget {
-  final String? selectedCategory;
-  final ValueChanged<String?> onChanged;
+class AppChoiceChipGroup extends StatelessWidget {
+  final List<ChipOption> options;
+  final bool Function(String value) isSelected;
+  final ValueChanged<String> onSelected;
 
-  const CategoryChip({
+  const AppChoiceChipGroup({
     super.key,
-    required this.selectedCategory,
-    required this.onChanged,
+    required this.options,
+    required this.isSelected,
+    required this.onSelected,
   });
 
   @override
   Widget build(BuildContext context) {
-    final categories = [
-      {'label': '☕ 카페', 'value': 'cafe'},
-      {'label': '🍜 식사', 'value': 'food'},
-      {'label': '🏄 액티비티', 'value': 'activity'},
-      {'label': '🍺 술', 'value': 'drink'},
-      {'label': '🚗 관광', 'value': 'tour'},
-    ];
-
     return Wrap(
       spacing: 5,
       runSpacing: 10,
-      children: categories.map((category) {
-        final value = category['value']!;
-        final label = category['label']!;
-        final isSelected = selectedCategory == value;
+      children: options.map((option) {
+        final selected = isSelected(option.value);
 
         return Container(
           decoration: BoxDecoration(
@@ -43,23 +36,21 @@ class CategoryChip extends StatelessWidget {
           ),
           child: ChoiceChip(
             label: Text(
-              label,
+              option.label,
               style: TextStyle(
-                color: isSelected ? AppColors.blue600 : Colors.black87,
+                color: selected ? AppColors.blue600 : Colors.black87,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            selected: isSelected,
-            onSelected: (_) {
-              onChanged(isSelected ? null : value);
-            },
+            selected: selected,
+            onSelected: (_) => onSelected(option.value),
             backgroundColor: AppColors.white,
             selectedColor: AppColors.blue50,
             showCheckmark: false,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
               side: BorderSide(
-                color: isSelected ? AppColors.blue300 : AppColors.gray300,
+                color: selected ? AppColors.blue300 : AppColors.gray300,
                 width: 1.2,
               ),
             ),
