@@ -30,10 +30,21 @@ class ChatDetailViewModel extends ChangeNotifier {
       notifyListeners();
 
       final result = await chatApi.getChatDetail(meetingId);
-
       chatDetail = result;
 
       await connectSocket(meetingId);
+
+      final lastMessage = chatDetail?.messages.isNotEmpty == true
+          ? chatDetail!.messages.last
+          : null;
+
+      if (lastMessage != null && lastMessage.senderId != currentUserId) {
+        chatSocketService.markAsRead(
+          meetingId: meetingId,
+          lastReadMessageId: lastMessage.id,
+        );
+      }
+
       hasLoaded = true;
     } catch (e) {
       hasLoaded = false;
@@ -57,6 +68,7 @@ class ChatDetailViewModel extends ChangeNotifier {
       meetingId: meetingId,
       currentUserId: currentUserId,
       onNewMessage: _handleNewMessage,
+      onMessageRead: _handleMessageRead,
       onError: _handleSocketError,
     );
   }
@@ -87,9 +99,53 @@ class ChatDetailViewModel extends ChangeNotifier {
       meeting: current.meeting,
       messages: [...current.messages, message],
     );
+
     debugPrint(
       'VM handleNewMessage id=${message.id} content=${message.content}',
     );
+
+    notifyListeners();
+  }
+
+  void _handleMessageRead({
+    required int readerId,
+    required int previousLastReadMessageId,
+    required int lastReadMessageId,
+  }) {
+    final current = chatDetail;
+
+    if (current == null) return;
+
+    final updatedMessages = current.messages.map((message) {
+      final shouldDecrease =
+          message.senderId != readerId &&
+          message.id > previousLastReadMessageId &&
+          message.id <= lastReadMessageId;
+
+      if (!shouldDecrease) {
+        return message;
+      }
+
+      return MessageModel(
+        id: message.id,
+        roomId: message.roomId,
+        type: message.type,
+        senderId: message.senderId,
+        senderNickname: message.senderNickname,
+        senderProfileImageUrl: message.senderProfileImageUrl,
+        content: message.content,
+        createdAt: message.createdAt,
+        updatedAt: message.updatedAt,
+        unreadCount: message.unreadCount > 0 ? message.unreadCount - 1 : 0,
+      );
+    }).toList();
+
+    chatDetail = ChatDetailModel(
+      roomId: current.roomId,
+      meeting: current.meeting,
+      messages: updatedMessages,
+    );
+
     notifyListeners();
   }
 

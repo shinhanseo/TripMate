@@ -65,6 +65,7 @@ class MessageModel {
   final String content;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final int unreadCount;
 
   MessageModel({
     required this.id,
@@ -76,6 +77,7 @@ class MessageModel {
     required this.content,
     required this.createdAt,
     required this.updatedAt,
+    required this.unreadCount,
   });
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
@@ -91,6 +93,7 @@ class MessageModel {
       content: json['content'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
+      unreadCount: int.parse((json['unreadCount'] ?? 0).toString()),
     );
   }
 }

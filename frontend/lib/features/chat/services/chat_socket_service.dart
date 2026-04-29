@@ -16,7 +16,14 @@ class ChatSocketService {
   Future<void> connect({
     required String accessToken,
     required int meetingId,
+    required int currentUserId,
     required void Function(MessageModel message) onNewMessage,
+    required void Function({
+      required int readerId,
+      required int previousLastReadMessageId,
+      required int lastReadMessageId,
+    })
+    onMessageRead,
     required void Function(String message) onError,
   }) async {
     final joinCompleter = Completer<void>();
@@ -54,11 +61,28 @@ class ChatSocketService {
         final message = _parseMessage(data);
         onNewMessage(message);
 
-        if (message.senderId != null) {
+        if (message.senderId != null && message.senderId != currentUserId) {
           markAsRead(meetingId: meetingId, lastReadMessageId: message.id);
         }
       } catch (e) {
+        debugPrint('SOCKET new_message parse error=$e data=$data');
         onError('새 메시지 형식이 올바르지 않습니다.');
+      }
+    });
+
+    _socket!.on('message_read', (data) {
+      try {
+        debugPrint('SOCKET on message_read data=$data');
+
+        final map = Map<String, dynamic>.from(data as Map);
+
+        onMessageRead(
+          readerId: _toInt(map['readerId']),
+          previousLastReadMessageId: _toInt(map['previousLastReadMessageId']),
+          lastReadMessageId: _toInt(map['lastReadMessageId']),
+        );
+      } catch (e) {
+        debugPrint('SOCKET message_read parse error=$e data=$data');
       }
     });
 
@@ -93,6 +117,7 @@ class ChatSocketService {
     if (!isReady) {
       return false;
     }
+
     debugPrint(
       'SOCKET emit send_message meetingId=$meetingId content=$content isReady=$isReady',
     );
@@ -122,6 +147,7 @@ class ChatSocketService {
     _isJoined = false;
     _socket?.off('joined_room');
     _socket?.off('new_message');
+    _socket?.off('message_read');
     _socket?.off('socket_error');
     _socket?.off('connect_error');
     _socket?.off('error');
@@ -139,5 +165,10 @@ class ChatSocketService {
   String _parseErrorMessage(dynamic data) {
     final map = Map<String, dynamic>.from(data as Map);
     return (map['message'] ?? 'socket error').toString();
+  }
+
+  int _toInt(dynamic value) {
+    if (value is int) return value;
+    return int.parse(value.toString());
   }
 }
