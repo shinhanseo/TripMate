@@ -16,6 +16,11 @@ type SocketErrorPayload = {
   message: string;
 }
 
+type ReadMessagesPayload = {
+  meetingId: number;
+  lastReadMessageId: number;
+};
+
 type NewMessagePayload = {
   id: number;
   roomId: number;
@@ -334,6 +339,103 @@ export function setupChatSocket(server: http.Server) {
         client.release();
       }
 
+    });
+
+    socket.on("read_messages", async (payload: ReadMessagesPayload) => {
+      const meetingId = Number(payload?.meetingId);
+      const lastReadMessageId = Number(payload?.lastReadMessageId);
+
+      if (!Number.isInteger(meetingId) || meetingId <= 0) {
+        socket.emit("socket_error", {
+          message: "invalid meeting id",
+        } satisfies SocketErrorPayload);
+        return;
+      }
+
+      if (!Number.isInteger(lastReadMessageId) || lastReadMessageId <= 0) {
+        socket.emit("socket_error", {
+          message: "invalid last read message id",
+        } satisfies SocketErrorPayload);
+        return;
+      }
+
+      const client = await pool.connect();
+
+      try {
+        await client.query("begin");
+
+        const memberRes = await client.query(
+          `
+          select
+            cr.id as room_id,
+            crm.last_read_message_id
+          from chat_rooms cr
+          join chat_room_members crm
+            on crm.room_id = cr.id
+           and crm.user_id = $2
+          join chat_messages cm
+            on cm.id = $3
+           and cm.room_id = cr.id
+          where cr.meeting_id = $1
+          for update of crm
+          `,
+          [meetingId, userId, lastReadMessageId]
+        );
+
+        if (memberRes.rowCount === 0) {
+          await client.query("rollback");
+          socket.emit("socket_error", {
+            message: "chat room member not found",
+          } satisfies SocketErrorPayload);
+          return;
+        }
+
+        const roomId = memberRes.rows[0].room_id;
+        const previousLastReadMessageId =
+          memberRes.rows[0].last_read_message_id === null
+            ? 0
+            : Number(memberRes.rows[0].last_read_message_id);
+
+        const nextLastReadMessageId = Math.max(
+          previousLastReadMessageId,
+          lastReadMessageId
+        );
+
+        await client.query(
+          `
+          update chat_room_members
+          set
+            last_read_message_id = greatest(
+              coalesce(last_read_message_id, 0),
+              $3
+            ),
+            last_read_at = now()
+          where room_id = $1
+            and user_id = $2
+          `,
+          [roomId, userId, lastReadMessageId]
+        );
+
+        await client.query("commit");
+
+        if (nextLastReadMessageId > previousLastReadMessageId) {
+          io.to(getRoomName(meetingId)).emit("message_read", {
+            meetingId,
+            roomId: Number(roomId),
+            readerId: userId,
+            previousLastReadMessageId,
+            lastReadMessageId: nextLastReadMessageId,
+          });
+        }
+      } catch (error) {
+        await client.query("rollback");
+        console.error("read_messages error:", error);
+        socket.emit("socket_error", {
+          message: "failed to mark messages as read",
+        } satisfies SocketErrorPayload);
+      } finally {
+        client.release();
+      }
     });
 
     socket.on("disconnect", () => {
